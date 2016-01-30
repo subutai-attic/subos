@@ -1,0 +1,12 @@
+bindir=/apps/subutai/current/bin
+libdir=/apps/subutai/current/lib
+localstatedir=/mnt
+includedir=/apps/subutai/current/include
+rootfsmountdir=/apps/subutai/current/lib/lxc/rootfs
+
+Name: lxc
+Description: linux container tools
+Version: 1.1.5
+URL: http://linuxcontainers.org
+Libs: -L${libdir} -llxc -lutil
+Cflags: -I${includedir}

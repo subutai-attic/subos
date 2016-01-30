@@ -1,0 +1,22 @@
+=head2 Tue Sep 22 17:02:33 2015: C<Module> L<Collectd|Collectd>
+
+=over 4
+
+=item *
+
+C<installed into: /apps/subutai-mng/current/share/perl/5.18.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: >
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

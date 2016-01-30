@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+mkdir -p /var/run/openvswitch/
+
+while [ ! -f $SUBUTAI_APP_PREFIX/bin/ovs-vswitchd ]; do
+	sleep 1
+done
+
+while [ ! -S /var/run/openvswitch/db.sock ]; do
+    sleep 1
+done
+ovs-vsctl --no-wait init
+
+if [ -f "/var/run/openvswitch/vswitchd.pid" ]; then
+    grep "ovs-vswitchd" /proc/`cat /var/run/openvswitch/vswitchd.pid`/cmdline
+    if [ ! $? ]; then
+        echo "ovs-switchd seems already running"
+        exit 0
+    else
+        echo "the switchd is dead, long live the switchd"
+    fi
+fi
+
+#if [ "$SUBUTAI_APP_TYPE" == "subutai-mng" ]; then
+#	sed -i /writable/system-data/etc/network/interfaces.d/eth1 -e 's/dhcp/manual/g'
+#else
+#	sed -i /writable/system-data/etc/network/interfaces.d/eth0 -e 's/dhcp/manual/g'
+#fi
+
+init-br &
+ovs-vswitchd --pidfile=/var/run/openvswitch/vswitchd.pid --unixctl=/var/run/openvswitch/vswitch.ctl unix:/var/run/openvswitch/db.sock

@@ -1,0 +1,8 @@
+#!/bin/bash
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+if ! cgproxy --check-master; then
+    mount -o remount,rw /sys/fs/cgroup
+    cgmanager -m name=systemd 
+fi

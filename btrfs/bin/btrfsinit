@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+mkfs.btrfs -f $1
+
+echo "[Unit]
+Description = BTRFS mount
+
+[Mount]
+What = $1
+Where = /mnt 
+Type = btrfs
+
+[Install]
+WantedBy = multi-user.target" > /writable/system-data/etc/systemd/system/mnt.mount
+
+systemctl daemon-reload
+umount /mnt
+systemctl start mnt.mount
+systemctl enable mnt.mount
+
+mkdir -p /mnt/lib/lxc
+btrfs subvolume create /mnt/lib/lxc/lxc
+btrfs subvolume create /mnt/lib/lxc/lxc-data
+btrfs subvolume create /mnt/lib/lxc/lxc-data/tmpdir
+
+btrfs quota enable /mnt

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+# creating default ovs bridge and ports durin lxc startup
+vlan="`cat /mnt/lib/lxc/$1/config | grep "#vlan_id" | cut -d " " -f3`"
+
+if [ "$vlan" ]; then
+  ovs-vsctl --may-exist add-port br-int $5 tag=$vlan
+else
+  ovs-vsctl --may-exist add-port br-mng $5
+fi
+

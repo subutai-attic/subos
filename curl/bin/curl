@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+for i in {1..5}; do
+	if [ ! -f $SUBUTAI_APP_PREFIX/lib/libcurl.so.4 ]; then sleep 1; else break; fi
+done
+
+$SUBUTAI_APP_PREFIX/bin/bin/curl "$@"

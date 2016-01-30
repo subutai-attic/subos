@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+mkdir -p /var/run/openvswitch/
+
+modprobe openvswitch
+modprobe iptable_nat
+
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv4.conf.all.forwarding=1
+
+if [ "$(grep "gw.intra.lan" -c /etc/writable/hostname)" == "0" ]; then
+	echo "rh`date +%s`.gw.intra.lan" > /etc/writable/hostname
+        hostname -F /etc/writable/hostname
+fi
+
+while [ ! -f $SUBUTAI_APP_PREFIX/etc/ovs/vswitch.ovsschema ]; do
+        sleep 1
+done
+
+if [ -f $SUBUTAI_DATA_PREFIX/ovs/conf.db ]; then
+    echo "conf.db is already exist, skipping"
+else
+    echo "applying vswitch.ovsschema"
+    mkdir -p $SUBUTAI_DATA_PREFIX/ovs
+    ovsdb-tool create $SUBUTAI_DATA_PREFIX/ovs/conf.db $SUBUTAI_APP_PREFIX/etc/ovs/vswitch.ovsschema
+fi
+mkdir -p /var/run/openvswitch
+if [ -f "/var/run/openvswitch/db.sock" ]; then
+    echo "db.sock is already exist, skipping"
+else
+    echo "starting ovsdb-server"
+    ovsdb-server --remote=punix:/var/run/openvswitch/db.sock --remote=db:Open_vSwitch,Open_vSwitch,manager_options --pidfile=/var/run/openvswitch/db.pid --unixct=/var/run/openvswitch/ovsdb.ctl $SUBUTAI_DATA_PREFIX/ovs/conf.db
+fi

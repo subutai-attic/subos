@@ -1,0 +1,28 @@
+#!/bin/bash
+
+export PATH=/apps/subutai-mng/current/bin:/apps/subutai/current/bin:$PATH
+
+reinit_flows () {
+  echo "Re-init OVS flows"
+}
+
+case "$1" in
+  start)
+    #configuring management host ovs
+    #install all plugins default
+    #install_plugins
+    #Re-init OVS Flows
+    reinit_flows
+
+
+
+    edgePorts="/var/lib/apps/subutai-mng/current/var/subutai-network/p2p.txt"
+    cat $edgePorts | awk '{print "p2p -start -dev "$1" -ip "$2" -hash "$5" -ttl "$4" -key "$3 }' | bash
+
+    #learn git user
+
+  ;;
+  stop)
+  ;;
+esac
+

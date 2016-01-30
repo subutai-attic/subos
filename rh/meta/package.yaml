@@ -1,0 +1,41 @@
+name: subutai
+version: 4.0.0
+architecture: amd64
+vendor: SSF <info@subutai.io>
+type: framework
+services:
+ - name: p2p
+   security-template: unconfined
+   description: "p2p service"
+   start: bin/p2p -daemon -rpc 52523
+ - name: subutai-agent
+   security-policy:
+      apparmor: meta/subutai-agent.profile
+      seccomp: meta/subutai-agent.seccomp
+   description: "Subutai-agent service"
+   start: bin/subutai daemon
+ - name: ovs-init-db
+   security-policy:
+      apparmor: meta/ovs-db.profile
+      seccomp: meta/ovs-db.seccomp
+   caps: []
+   description: "Openvswitch DB service"
+   start: bin/ovs-init-db
+ - name: ovs-init-switch
+   security-template: unconfined
+   caps: []
+   description: "Openvswitch vswitch service"
+   start: bin/ovs-init-switch
+ - name: collectd
+   security-template: unconfined
+   description: "Collectd service"
+   start: bin/collectd-wrapper -f -C etc/collectd.conf
+ - name: cgmanager 
+   security-template: unconfined
+   description: "CGManager service"
+   start: bin/cgmanagerd 
+#   stop: bin/cgmanagerd
+ - name: rngd
+   security-template: unconfined
+   description: "rngd service"
+   start: bin/rngd -f -r /dev/urandom 
