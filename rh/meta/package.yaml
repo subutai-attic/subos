@@ -4,6 +4,18 @@ architecture: amd64
 vendor: SSF <info@subutai.io>
 type: framework
 services:
+ - name: dns-service
+   security-policy:
+      apparmor: meta/dns-service.profile
+      seccomp: meta/dnsmasq-service.seccomp
+   description: "Snappy dns service"
+   start: bin/dns
+ - name: dhcpd-service
+   security-policy:
+      apparmor: meta/dhcpd-service.profile
+      seccomp: meta/dnsmasq-service.seccomp
+   description: "Snappy dhcpd service"
+   start: bin/dhcpd
  - name: p2p
    security-template: unconfined
    description: "p2p service"

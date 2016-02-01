@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+# creating default ovs bridge and ports durin lxc startup
+vlan="$(grep '#vlan_id' /mnt/lib/lxc/$1/config | awk '{print $3}')"
+gateway="$(grep 'lxc.network.ipv4.gateway' /mnt/lib/lxc/$1/config | awk '{print $3}')"
+
+ovs-vsctl --if-exists del-port wan $5
+
+if [ "$5" == "management" ]; then
+	ovs-vsctl add-port wan $5 tag=200
+	ovs-vsctl --may-exist add-port wan mng-gw tag=200 -- set interface mng-gw type=internal
+	ifconfig mng-gw 10.10.10.254
+
+	for i in 8101 8443 8551 1099 43020 53647 8080 8883 8083 8086 8088 8444 5005; do
+	        iptables -t nat -A PREROUTING -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
+	done
+	iptables -t nat -A PREROUTING -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
+
+	exit 0
+elif [ "$vlan" ]; then
+	ovs-vsctl --may-exist add-port wan gw-$vlan tag=$vlan -- set interface gw-$vlan type=internal
+	ovs-vsctl add-port wan $5 tag=$vlan
+	cat <<EOF > /writable/system-data/etc/network/interfaces.d/gw-$vlan
+allow-env gw-$vlan
+iface gw-$vlan inet static
+  address $gateway
+  netmask 255.255.255.0
+EOF
+	ifconfig gw-$vlan $gateway
+else
+	ovs-vsctl add-port lxc-br $5
+fi

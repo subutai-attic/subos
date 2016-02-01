@@ -85,8 +85,9 @@ function prepare_nic {
 	echo "Restoring network"
 	sleep 5
 	vboxmanage modifyvm $CLONE --nic4 none
-        vboxmanage modifyvm $CLONE --nic2 bridged
-        vboxmanage modifyvm $CLONE --nic1 intnet
+#        vboxmanage modifyvm $CLONE --nic2 bridged
+#        vboxmanage modifyvm $CLONE --nic1 intnet
+        vboxmanage modifyvm $CLONE --nic1 bridged 
 }
 
 function export_ova {
@@ -120,7 +121,7 @@ function setup_mng_var {
 
 function setup_rh_var {
 	SUB_TYPE="subutai"
-        LIST="btrfs collectd common curl lxc ovs rh rngd subutai cgmanager p2p"
+        LIST="btrfs collectd common curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq"
        	CLONE=rh-autobuild-"$DATE"
 }
 
