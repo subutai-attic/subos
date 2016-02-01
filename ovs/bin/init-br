@@ -3,25 +3,28 @@
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
   
+#iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 
+
 mkdir -p /var/run/openvswitch/
 
-while [ "`ip link | grep 'br-int' | wc -l`" -eq "0" ]; do
-	mkdir -p /var/run/openvswitch/
+while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	sleep 1
-	ovs-vsctl --may-exist add-br br-int
-	ovs-vsctl --may-exist add-port br-int eth0
+	ovs-vsctl --may-exist add-br wan
+	ovs-vsctl --may-exist add-port wan eth0
 done
-
-while [ "`ip link | grep 'br-mng' | wc -l`" -eq "0" ]; do
-	ovs-vsctl --may-exist add-br br-mng
-	ovs-vsctl --may-exist add-port br-mng eth1
-done
-
-ifconfig eth0 up 
-ifconfig eth1 up 
 ifconfig eth0 0
-ifconfig eth1 0
-dhclient br-int &
-dhclient br-mng &
+dhclient wan
+ovs-vsctl --may-exist add-port wan mng-net tag=200 -- set interface mng-net type=internal
 
-$SUBUTAI_DATA_PREFIX/var/subutai-network/service-interface start
+while [ "`ip link | grep 'nat' | wc -l`" -eq "0" ]; do
+        sleep 1
+        ovs-vsctl --may-exist add-br lxc-br
+	ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
+done
+ifconfig nat 10.10.0.254
+
+iptables -t nat -A POSTROUTING -j MASQUERADE
+ifup -a --allow=env
+dhclient mng-net
+
+#$SUBUTAI_DATA_PREFIX/var/subutai-network/service-interface start
