@@ -2,7 +2,11 @@
 
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
-  
+mng_vlan=$MNG_VLAN
+if [ "$mng_vlan" == "" ]; then
+        mng_vlan=200
+fi
+ 
 #iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 
 
 mkdir -p /var/run/openvswitch/
@@ -14,7 +18,7 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 done
 ifconfig eth0 0
 dhclient wan
-ovs-vsctl --may-exist add-port wan mng-net tag=200 -- set interface mng-net type=internal
+ovs-vsctl --may-exist add-port wan mng-net tag=$mng_vlan -- set interface mng-net type=internal
 
 while [ "`ip link | grep 'nat' | wc -l`" -eq "0" ]; do
         sleep 1
