@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 mng_vlan=$MNG_VLAN
@@ -14,10 +13,14 @@ mkdir -p /var/run/openvswitch/
 while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	sleep 1
 	ovs-vsctl --may-exist add-br wan
-	ovs-vsctl --may-exist add-port wan eth0
 done
-ifconfig eth0 0
-dhclient wan
+ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
+ovs-vsctl --may-exist add-port wan eth0
+ifconfig eth0 0 && dhclient wan
+cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
+auto eth0
+iface eth0 inet manual
+EOF
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set port mng-net tag=$mng_vlan
 
