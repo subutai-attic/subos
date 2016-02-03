@@ -18,7 +18,8 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 done
 ifconfig eth0 0
 dhclient wan
-ovs-vsctl --may-exist add-port wan mng-net tag=$mng_vlan -- set interface mng-net type=internal
+ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
+ovs-vsctl set port mng-net tag=$mng_vlan
 
 while [ "`ip link | grep 'nat' | wc -l`" -eq "0" ]; do
         sleep 1
