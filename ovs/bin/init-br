@@ -1,8 +1,11 @@
 #!/bin/bash
-
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
-  
+mng_vlan=$MNG_VLAN
+if [ "$mng_vlan" == "" ]; then
+        mng_vlan=200
+fi
+ 
 #iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE 
 
 mkdir -p /var/run/openvswitch/
@@ -10,11 +13,16 @@ mkdir -p /var/run/openvswitch/
 while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	sleep 1
 	ovs-vsctl --may-exist add-br wan
-	ovs-vsctl --may-exist add-port wan eth0
 done
-ifconfig eth0 0
-dhclient wan
-ovs-vsctl --may-exist add-port wan mng-net tag=200 -- set interface mng-net type=internal
+ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
+ovs-vsctl --may-exist add-port wan eth0
+ifconfig eth0 0 && dhclient wan
+cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
+auto eth0
+iface eth0 inet manual
+EOF
+ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
+ovs-vsctl set port mng-net tag=$mng_vlan
 
 while [ "`ip link | grep 'nat' | wc -l`" -eq "0" ]; do
         sleep 1
