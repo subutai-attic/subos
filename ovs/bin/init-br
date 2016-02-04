@@ -29,7 +29,7 @@ while [ "`ip link | grep 'nat' | wc -l`" -eq "0" ]; do
         ovs-vsctl --may-exist add-br lxc-br
 	ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
 done
-ifconfig nat 10.10.0.254
+ifconfig nat 10.10.0.254/24
 
 iptables -t nat -A POSTROUTING -j MASQUERADE
 ifup -a --allow=env
