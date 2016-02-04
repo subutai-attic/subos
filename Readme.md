@@ -25,7 +25,7 @@ Install VirtualBox and sshpass:
  
 **VirtualBox requires virtualization support enabled on your CPU. If you don't know what is it and how to enable it, http://askubuntu.com/a/256853 - here is the askubuntu answer**
  
-Download snappy template from "LINK HERE". Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but, do not change disks configuration. Please make sure, that virtual machines name is snappy and select existing network interface in network bridge configuration. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
+Download snappy template from https://www.dropbox.com/s/jj28sgj9xlg3zew/snappy.ova?dl=0. Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but, do not change disks configuration. Please make sure, that virtual machines name is snappy and select existing network interface in network bridge configuration. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
 
 **Do not start snappy virtual machine - this is a templates for our test servers**
  
@@ -53,12 +53,14 @@ Please note that autobuild script stores all output files in "../export" directo
 **./autobuild.sh -e box -p**	create Subutai vagrant box without rebuilding snap package if old one is exist
 
 ## Deploying Subutai Management server
-Once you have host with installed Subutai package you can run command
+Once you have host with installed Subutai package, you can run command
 
      sudo subutai import management
 
-and after few minutes you will have your own Subutai Management server deployed and ready to create your environments. You can access Subutai Web UI in browser by typing an address https://<host_ip>:8443
+and after few minutes you will have your own Subutai Management server deployed and ready to create your environments. You can access Subutai Web UI in browser by typing an address https://host_ip:8443
+
 login: admin
+
 password: secret
 
-You can add more Subutai hosts to this management server just by setting up new VMs in the same LAN. If you want to set up several SS management servers in the same LAN, you need to change "MNG_VLAN" value in common/subutai.env file before build or reboot already deployed host after MNG_VLAN value update.
+You can add more Subutai hosts to this management server just by setting up new VMs in the same LAN. If you want to set up several different SS management servers in the same LAN, you need to change "MNG_VLAN" value in common/subutai.env file before build or reboot already deployed host after MNG_VLAN value update.
