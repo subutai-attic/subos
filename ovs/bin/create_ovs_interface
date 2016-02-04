@@ -18,10 +18,12 @@ if [ "$5" == "management" ]; then
 	ovs-vsctl --may-exist add-port wan mng-gw tag=$mng_vlan -- set interface mng-gw type=internal
 	ifconfig mng-gw 10.10.10.254
 
-	for i in 8101 8443 8551 1099 43020 53647 8080 8883 8083 8086 8088 8444 5005; do
-	        iptables -t nat -A PREROUTING -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
-	done
-	iptables -t nat -A PREROUTING -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
+	for i in 8101 8551 1099 43020 53647 8080 8883 8083 8086 8088 5005; do
+                iptables -t nat -A PREROUTING -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
+        done
+        iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 8443 -j DNAT --to-destination 10.10.10.1:8443
+        iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 8444 -j DNAT --to-destination 10.10.10.1:8444
+        iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
 
 	exit 0
 elif [ "$vlan" ]; then
