@@ -106,7 +106,7 @@ function export_box {
 }
 
 function setup_var {
-        LIST="btrfs collectd common curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq"
+        LIST="btrfs collectd curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq"
        	CLONE=subutai-"$DATE"
 }
 
@@ -164,11 +164,11 @@ if [ "$VM" == "true" -o "$EXPORT" != "false" ]; then
 		echo "Exported to $EXPORT_DIR"
 	fi
 	if [ "$VM" == "true" ]; then
-		echo "Starting vm"
 		vboxmanage startvm --type headless $CLONE
+		echo "Waiting for Subutai IP address"
+		echo -e "Please use following command to access your new Subutai:\\n ssh root@`nc -l 48723`"
 	else
 		vboxmanage unregistervm --delete $CLONE
 	fi
 fi
 
-echo "Please use following IP for access your new RH: `nc -l 48723`"
