@@ -51,3 +51,24 @@ services:
    security-template: unconfined
    description: "rngd service"
    start: bin/rngd -f -r /dev/urandom 
+binaries:
+ - exec: bin/subutai
+   name: subutai
+   security-template: unconfined
+ - exec: bin/lxc-attach
+   name: lxc-attach
+   security-template: unconfined
+ - exec: bin/btrfsinit
+   name: btrfsinit
+ - exec: bin/ovs-vsctl
+   name: ovs-vsctl
+   security-policy:
+      apparmor: meta/ovs-db.profile
+      seccomp: meta/ovs-db.seccomp
+   caps: []
+ - exec: bin/ovs-ofctl
+   name: ovs-ofctl
+   security-policy:
+      apparmor: meta/ovs-db.profile
+      seccomp: meta/ovs-db.seccomp
+   caps: []
