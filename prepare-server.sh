@@ -27,6 +27,8 @@ ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
 cat /root/.ssh/id_rsa.pub >> /home/ubuntu/.ssh/authorized_keys
 echo 'Defaults secure_path="/apps/subutai/current/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' > /etc/sudoers.d/subutai
 
+echo "AUTOBUILD_IP=IPPLACEHOLDER" >> /apps/subutai/current/bin/subutai.env
+
 echo "alias vi='vim.tiny'" >> /home/ubuntu/.bashrc
 echo "alias vim='vim.tiny'" >> /home/ubuntu/.bashrc
 echo "alias vi='vim.tiny'" >> /root/.bashrc
