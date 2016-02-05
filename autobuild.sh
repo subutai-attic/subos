@@ -165,7 +165,7 @@ if [ "$VM" == "true" -o "$EXPORT" != "false" ]; then
 	fi
 	if [ "$VM" == "true" ]; then
 		echo "Starting vm"
-		vboxmanage startvm $CLONE
+		vboxmanage startvm --type headless $CLONE
 	else
 		vboxmanage unregistervm --delete $CLONE
 	fi
