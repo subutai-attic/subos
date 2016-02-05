@@ -71,6 +71,8 @@ function install_snap {
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "mkdir tmpfs; sudo mount -t tmpfs -o size=1G tmpfs /home/ubuntu/tmpfs"
 	echo "Copying snap"
 	sshpass -p "ubuntu" scp -P4567 prepare-server.sh /tmp/subutai_4.0.0_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
+	AUTOBUILD_IP=$(ifconfig `route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') 
+	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "sed -i \"s/IPPLACEHOLDER/$AUTOBUILD_IP/g\" /home/ubuntu/tmpfs/prepare-server.sh"
 	echo "Running install script"
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "sudo /home/ubuntu/tmpfs/prepare-server.sh"
 }
@@ -168,3 +170,5 @@ if [ "$VM" == "true" -o "$EXPORT" != "false" ]; then
 		vboxmanage unregistervm --delete $CLONE
 	fi
 fi
+
+echo "Please use following IP for access your new RH: `nc -l 48723`"
