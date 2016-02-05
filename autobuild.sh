@@ -106,7 +106,7 @@ function export_box {
 }
 
 function setup_var {
-        LIST="btrfs collectd common curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq"
+        LIST="btrfs collectd curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq"
        	CLONE=subutai-"$DATE"
 }
 
