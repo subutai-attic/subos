@@ -25,32 +25,42 @@ Install VirtualBox and sshpass:
  
 **VirtualBox requires virtualization support enabled on your CPU. If you don't know what is it and how to enable it, http://askubuntu.com/a/256853 - here is the askubuntu answer**
  
-Download snappy template from http://storage.critical-factor.com/index.php/s/ZeOTFbVLNnDtL2Q. Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but, do not change disks configuration. Please make sure, that virtual machines name is snappy. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
+Download snappy template from https://www.dropbox.com/s/jj28sgj9xlg3zew/snappy.ova?dl=0. Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but, do not change disks configuration. Please make sure, that virtual machines name is snappy and select existing network interface in network bridge configuration. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
 
 **Do not start snappy virtual machine - this is a templates for our test servers**
  
 After this you should clone Snappy Subutai repo from Stash: 
 
-    git clone ssh://git@stash.subutai.io:7999/snap/main.git
+    git clone git@github.com:subutai-io/Subutai-snappy.git 
 
 When it's done, you'll have all necessary files to work with Subutai on Snappy. Directory "main" contains separated packages of Subutai on Snappy and two scripts - autobuild.sh and prepare-server.sh. We will work with autobuild.sh script.
 
 ### Autobuild usage
 As we stated before, autobuild script can work in different modes. To change build modes you should specify following flags:
 
-	-t | --type 	specify which package or VM we want - rh for resource host and mng for management server. By default, assuming both types
 	-b | --build	build snap package
 	-v | --vm		  create and run preconfigured virtual machine
-	-e | --export	create ova or box file from our snap packages. By default, assuming both types
+	-e | --export	create ova or box file from our snap packages
 	-p | --preserve	can be used with -v or -e flags to prevent rebuilding snap packages for virtual machine
 
 Please note that autobuild script stores all output files in "../export" directory, ie next to directory main
 
 ### Examples:
-**./autobuild.sh**	default configuration - build rh and mng snap packages
+**./autobuild.sh -b**	build Subutai snap package that can be installed on Snappy Ubuntu
 
-**./autobuild.sh -t rh -b**	create snap packages for resource host
+**./autobuild.sh -v**	start new virtual machine with installed Subutai package
 
-**./autobuild.sh -v**	start new virtual management server and resource host
+**./autobuild.sh -e box -p**	create Subutai vagrant box without rebuilding snap package if old one is exist
 
-**./autobuild.sh -t mng -e box -p**	create Management server vagrant box without rebuilding snap package if old one is exist
+## Deploying Subutai Management server
+Once you have host with installed Subutai package, you can run command
+
+     sudo subutai import management
+
+and after few minutes you will have your own Subutai Management server deployed and ready to create your environments. You can access Subutai Web UI in browser by typing an address https://host_ip:8443
+
+login: admin
+
+password: secret
+
+You can add more Subutai hosts to this management server just by setting up new VMs in the same LAN. If you want to set up several different SS management servers in the same LAN, you need to change "MNG_VLAN" value in common/subutai.env file before build or reboot already deployed host after MNG_VLAN value update.
