@@ -14,7 +14,10 @@ gateway="$(grep 'lxc.network.ipv4.gateway' /mnt/lib/lxc/$1/config | awk '{print 
 if [ "$5" == "management" ]; then
         ovs-vsctl --may-exist add-port wan $5 tag=$mng_vlan
         ovs-vsctl --may-exist add-port wan mng-gw tag=$mng_vlan -- set interface mng-gw type=internal
-        ifconfig mng-gw 10.10.10.254/24
+	while [ "$( ifconfig -s | grep -c mng-gw )" != "1" ]; do
+                ifconfig mng-gw 10.10.10.254/24
+                sleep 1
+        done
 
         for i in 8101 8551 1099 43020 53647 8080 8883 8083 8086 8088 5005; do
                 iptables -t nat -A PREROUTING -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
