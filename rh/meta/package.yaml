@@ -60,6 +60,7 @@ binaries:
    security-template: unconfined
  - exec: bin/btrfsinit
    name: btrfsinit
+   security-template: unconfined
  - exec: bin/ovs-vsctl
    name: ovs-vsctl
    security-policy:
