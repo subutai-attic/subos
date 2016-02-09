@@ -17,7 +17,9 @@ done
 ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
 ovs-vsctl --may-exist add-port wan eth0
 ifconfig eth0 0 && dhclient wan
-echo $(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') | nc $AUTOBUILD_IP 48723
+if [ "$AUTOBUILD_IP" != "" ]; then
+	echo $(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') | nc $AUTOBUILD_IP 48723
+fi
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
 auto eth0
 iface eth0 inet manual
@@ -30,7 +32,11 @@ while [ "`ip link | grep 'nat' | wc -l`" -eq "0" ]; do
         ovs-vsctl --may-exist add-br lxc-br
 	ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
 done
-ifconfig nat 10.10.0.254/24
+
+while [ "$( ifconfig -s | grep -c nat )" != "1" ]; do
+	ifconfig nat 10.10.0.254/24
+        sleep 1
+done
 
 iptables -t nat -A POSTROUTING -j MASQUERADE
 ifup -a --allow=env
