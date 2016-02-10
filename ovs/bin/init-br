@@ -21,9 +21,11 @@ if [ "$AUTOBUILD_IP" != "" ]; then
 	echo $(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') | nc $AUTOBUILD_IP 48723
 fi
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
-auto eth0
+allow-hotplug eth0
 iface eth0 inet manual
 EOF
+systemctl daemon-reload
+#systemctl restart ifup@eth0
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set port mng-net tag=$mng_vlan
 
@@ -31,11 +33,7 @@ while [ "`ip link | grep 'nat' | wc -l`" -eq "0" ]; do
         sleep 1
         ovs-vsctl --may-exist add-br lxc-br
 	ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
-done
-
-while [ "$( ifconfig -s | grep -c nat )" != "1" ]; do
 	ifconfig nat 10.10.0.254/24
-        sleep 1
 done
 
 iptables -t nat -A POSTROUTING -j MASQUERADE
