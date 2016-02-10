@@ -24,6 +24,7 @@ cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
 auto eth0
 iface eth0 inet manual
 EOF
+systemctl restart ifup@eth0
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set port mng-net tag=$mng_vlan
 
