@@ -4,6 +4,10 @@ architecture: amd64
 vendor: SSF <info@subutai.io>
 type: framework
 services:
+ - name: nginx 
+   security-template: unconfined
+   description: "nginx service"
+   start: bin/nginx.sh start
  - name: dns-service
    security-policy:
       apparmor: meta/dns-service.profile

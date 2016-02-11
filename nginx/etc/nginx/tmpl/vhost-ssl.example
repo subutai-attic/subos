@@ -20,8 +20,8 @@ server {
     server_name DOMAIN;
 
     ssl on;
-    ssl_certificate /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.crt;
-    ssl_certificate_key /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.key;
+    ssl_certificate /var/lib/apps/subutai/current/web/ssl/DOMAIN.crt;
+    ssl_certificate_key /var/lib/apps/subutai/current/web/ssl/DOMAIN.key;
 
     location / {
 	proxy_pass http://DOMAIN-upstream/;
