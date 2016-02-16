@@ -31,6 +31,8 @@ elif [ "$vlan" ]; then
         ovs-vsctl --if-exists del-port wan $5
         ovs-vsctl --may-exist add-port wan gw-$vlan tag=$vlan -- set interface gw-$vlan type=internal
         ovs-vsctl add-port wan $5 tag=$vlan
+	of_port=$(ovs-ofctl queue-get-config wan gw-$vlan | cut -d"=" -f3)
+	ovs-ofctl add-flow wan "priority=2500,in_port=$of_port,ip,nw_src=192.168.0.0/16 actions=drop"
         cat <<EOF > /writable/system-data/etc/network/interfaces.d/gw-$vlan
 allow-env gw-$vlan
 iface gw-$vlan inet static
