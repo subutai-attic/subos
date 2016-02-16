@@ -1,7 +1,8 @@
 #!/bin/bash
 
+set -e 
+
 subutai clone master management
-sleep 2
 cp subutai-4.0.0-RC6.tar.gz management.tar.gz /mnt/lib/lxc/management/home/subutai/
 lxc-attach -n management -- mkdir -p /apps/subutai-mng /var/lib/apps/subutai-mng/current
 lxc-attach -n management -- tar -C /apps/subutai-mng/ -xzf /home/subutai/subutai-4.0.0-RC6.tar.gz

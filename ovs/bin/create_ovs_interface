@@ -12,8 +12,10 @@ vlan="$(grep '#vlan_id' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 gateway="$(grep 'lxc.network.ipv4.gateway' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 
 if [ "$5" == "management" ]; then
-        ovs-vsctl --may-exist add-port wan $5 tag=$mng_vlan
-        ovs-vsctl --may-exist add-port wan mng-gw tag=$mng_vlan -- set interface mng-gw type=internal
+	ovs-vsctl --may-exist add-port wan $5
+	ovs-vsctl --may-exist add-port wan mng-gw -- set interface mng-gw type=internal
+	ovs-vsctl set port $5 tag=$mng_vlan
+	ovs-vsctl set port mng-gw tag=$mng_vlan
 	while [ "$( ifconfig -s | grep -c mng-gw )" != "1" ]; do
                 ifconfig mng-gw 10.10.10.254/24
                 sleep 1
