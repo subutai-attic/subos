@@ -12,8 +12,10 @@ vlan="$(grep '#vlan_id' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 gateway="$(grep 'lxc.network.ipv4.gateway' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 
 if [ "$5" == "management" ]; then
-        ovs-vsctl --may-exist add-port wan $5 tag=$mng_vlan
-        ovs-vsctl --may-exist add-port wan mng-gw tag=$mng_vlan -- set interface mng-gw type=internal
+	ovs-vsctl --may-exist add-port wan $5
+	ovs-vsctl --may-exist add-port wan mng-gw -- set interface mng-gw type=internal
+	ovs-vsctl set port $5 tag=$mng_vlan
+	ovs-vsctl set port mng-gw tag=$mng_vlan
 	while [ "$( ifconfig -s | grep -c mng-gw )" != "1" ]; do
                 ifconfig mng-gw 10.10.10.254/24
                 sleep 1
@@ -31,6 +33,9 @@ elif [ "$vlan" ]; then
         ovs-vsctl --if-exists del-port wan $5
         ovs-vsctl --may-exist add-port wan gw-$vlan tag=$vlan -- set interface gw-$vlan type=internal
         ovs-vsctl add-port wan $5 tag=$vlan
+	of_port=$(ovs-ofctl queue-get-config wan gw-$vlan | cut -d"=" -f3)
+        ovs-ofctl add-flow wan "priority=2600,in_port=$of_port,ip,nw_src=$gateway actions=normal"
+	ovs-ofctl add-flow wan "priority=2500,in_port=$of_port,ip,nw_src=192.168.0.0/16 actions=drop"
         cat <<EOF > /writable/system-data/etc/network/interfaces.d/gw-$vlan
 allow-env gw-$vlan
 iface gw-$vlan inet static
