@@ -23,7 +23,7 @@ services:
  - name: p2p
    security-template: unconfined
    description: "p2p service"
-   start: bin/p2p -daemon -save /var/lib/apps/subutai/current/p2p.save 
+   start: bin/p2p daemon -save /var/lib/apps/subutai/current/p2p.save 
  - name: subutai-agent
    security-policy:
       apparmor: meta/subutai-agent.profile
