@@ -26,12 +26,9 @@ dhclient -r eth0
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set port mng-net tag=$mng_vlan
 
-while [ "`ip link | grep 'nat' | wc -l`" -eq "0" ]; do
-        sleep 1
-        ovs-vsctl --may-exist add-br lxc-br
-	ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
-	ifconfig nat 10.10.0.254/24
-done
+ovs-vsctl --may-exist add-br lxc-br
+ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
+ifconfig nat 10.10.0.254/24
 
 iptables -t nat -A POSTROUTING -j MASQUERADE
 ifup -a --allow=env
