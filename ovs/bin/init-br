@@ -1,9 +1,11 @@
 #!/bin/bash
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
-mng_vlan=$MNG_VLAN
-if [ "$mng_vlan" == "" ]; then
-        mng_vlan=200
+
+MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/vlan)"
+if [ "$MNG_VLAN" == "" ]; then
+        MNG_VLAN=2
+	echo "$MNG_VLAN" > $SUBUTAI_DATA_PREFIX/vlan
 fi
 
 mkdir -p /var/run/openvswitch/
@@ -24,7 +26,7 @@ iface eth0 inet manual
 EOF
 dhclient -r eth0
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
-ovs-vsctl set port mng-net tag=$mng_vlan
+ovs-vsctl set port mng-net tag=$MNG_VLAN
 
 ovs-vsctl --may-exist add-br lxc-br
 ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal

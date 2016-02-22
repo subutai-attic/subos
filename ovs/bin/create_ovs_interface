@@ -4,18 +4,20 @@
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
 # creating default ovs bridge and ports durin lxc startup
-mng_vlan=$MNG_VLAN
-if [ "$mng_vlan" == "" ]; then
-        mng_vlan=200
+MNG_VLAN="$(cat /var/lib$SUBUTAI_APP_PREFIX/vlan)"
+if [ "$MNG_VLAN" == "" ]; then
+        MNG_VLAN=2
+	echo "$MNG_VLAN" > /var/lib$SUBUTAI_APP_PREFIX/vlan
 fi
+
 vlan="$(grep '#vlan_id' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 gateway="$(grep 'lxc.network.ipv4.gateway' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 
 if [ "$5" == "management" ]; then
 	ovs-vsctl --may-exist add-port wan $5
 	ovs-vsctl --may-exist add-port wan mng-gw -- set interface mng-gw type=internal
-	ovs-vsctl set port $5 tag=$mng_vlan
-	ovs-vsctl set port mng-gw tag=$mng_vlan
+	ovs-vsctl set port $5 tag=$MNG_VLAN
+	ovs-vsctl set port mng-gw tag=$MNG_VLAN
 	while [ "$( ifconfig -s | grep -c mng-gw )" != "1" ]; do
                 ifconfig mng-gw 10.10.10.254/24
                 sleep 1
