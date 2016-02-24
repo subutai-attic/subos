@@ -4,11 +4,12 @@
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
 current="$(subutai -v | awk '{print $3}')"
-latest="https://github.com$(curl -s -L https://github.com/subutai-io/Subutai-snappy/releases/latest | grep "\.snap" | head -1 | cut -d"\"" -f2)"
+link="https://github.com$(curl -s -L https://github.com/subutai-io/Subutai-snappy/releases/latest | grep -E "download.*snap" | tail -1 | cut -d"\"" -f2)"
+version="https://github.com$(curl -s -L https://github.com/subutai-io/Subutai-snappy/releases/latest | grep -E "snap.*--")"
 
-if [ "$(echo "$latest" | grep -c "$current")" -eq "0" ]; then
+if [ "$(echo "$version" | grep -c "$current")" -eq "0" ]; then
 	echo "Updating Subutai Resource host"
-	curl --progress-bar -L "$latest" -o /tmp/snappy-latest.snap
+	curl --progress-bar -L "$link" -o /tmp/snappy-latest.snap
 	snappy install --allow-unauthenticated /tmp/snappy-latest.snap
 	rm /tmp/snappy-latest.snap
 else
