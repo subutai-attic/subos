@@ -3,7 +3,7 @@ upstream DOMAIN-upstream {
 	server localhost:81;
 }
 
-server{
+server {
     listen      80;
     server_name DOMAIN;
 
@@ -15,8 +15,8 @@ server {
     server_name DOMAIN;
 
     ssl on;
-    ssl_certificate /var/lib/apps/subutai/current/web/ssl/DOMAIN.crt;
-    ssl_certificate_key /var/lib/apps/subutai/current/web/ssl/DOMAIN.key;
+    ssl_certificate /var/lib/apps/subutai/current/web/ssl/UNIXDATE.crt;
+    ssl_certificate_key /var/lib/apps/subutai/current/web/ssl/UNIXDATE.key;
 
     location / {
 	proxy_pass http://DOMAIN-upstream/;
