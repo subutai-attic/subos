@@ -27,7 +27,8 @@ function snap_build {
 		cp -r $i/* /tmp/tmpdir_subutai
 	done
 	if [ "$TAG" != "" ]; then
-		sed -i /tmp/tmpdir_subutai/bin/subutai.env -e "s/MNG_VLAN=.*/MNG_VLAN=$TAG/g"
+		sed -i /tmp/tmpdir_subutai/bin/init-br -e "s/MNG_VLAN=2/MNG_VLAN=$TAG/g"
+		sed -i /tmp/tmpdir_subutai/bin/create_ovs_interface -e "s/MNG_VLAN=2/MNG_VLAN=$TAG/g"
 	fi
 	if [ "$BUILD" == "true" ]; then
 		echo "Building Subutai snap"

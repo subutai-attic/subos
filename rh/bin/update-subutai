@@ -7,10 +7,10 @@ current="$(subutai -v | awk '{print $3}')"
 latest="https://github.com$(curl -s -L https://github.com/subutai-io/Subutai-snappy/releases/latest | grep "\.snap" | head -1 | cut -d"\"" -f2)"
 
 if [ "$(echo "$latest" | grep -c "$current")" -eq "0" ]; then
-	echo "Downloading Subutai Agent update"
+	echo "Updating Subutai Resource host"
 	curl --progress-bar -L "$latest" -o /tmp/snappy-latest.snap
 	snappy install --allow-unauthenticated /tmp/snappy-latest.snap
 	rm /tmp/snappy-latest.snap
 else
-	echo "Your Subutai Agent is up-to-date"
+	echo "Subutai package is up-to-date"
 fi
