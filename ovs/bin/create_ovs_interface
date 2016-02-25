@@ -43,7 +43,10 @@ iface gw-$vlan inet static
   netmask 255.255.255.0
 EOF
         ifconfig gw-$vlan $gateway
+	echo -e "\n$gateway	gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
 else
         ovs-vsctl --if-exists del-port lxc-br $5
         ovs-vsctl --may-exist add-port lxc-br $5
+	echo -e "\n10.10.0.254  gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
 fi
+
