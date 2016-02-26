@@ -11,6 +11,5 @@ lxc-attach -n management -- dhclient eth0
 lxc-attach -n management -- apt update
 lxc-attach -n management -- apt install --force-yes -y curl
 rm -f /mnt/lib/lxc/management/home/subutai/subutai-*.tar.gz
-rm -f /mnt/lib/lxc/management/home/
-subutai/management.tar.gz
+rm -f /mnt/lib/lxc/management/home/subutai/management.tar.gz
 subutai export management
