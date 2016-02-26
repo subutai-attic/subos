@@ -4,6 +4,10 @@ architecture: amd64
 vendor: SSF <info@subutai.io>
 type: framework
 services:
+ - name: nginx 
+   security-template: unconfined
+   description: "nginx service"
+   start: bin/nginx.sh start
  - name: dns-service
    security-policy:
       apparmor: meta/dns-service.profile
@@ -19,7 +23,7 @@ services:
  - name: p2p
    security-template: unconfined
    description: "p2p service"
-   start: bin/p2p -daemon -rpc 52523
+   start: bin/p2p daemon -save /var/lib/apps/subutai/current/p2p.save 
  - name: subutai-agent
    security-policy:
       apparmor: meta/subutai-agent.profile
@@ -52,6 +56,9 @@ services:
    description: "rngd service"
    start: bin/rngd -f -r /dev/urandom 
 binaries:
+ - exec: bin/update-subutai
+   name: update-subutai
+   security-template: unconfined
  - exec: bin/subutai
    name: subutai
    security-template: unconfined

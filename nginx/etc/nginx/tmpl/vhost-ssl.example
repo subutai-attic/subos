@@ -3,16 +3,11 @@ upstream DOMAIN-upstream {
 	server localhost:81;
 }
 
-server{
+server {
     listen      80;
     server_name DOMAIN;
 
-    location / {
-        proxy_pass http://DOMAIN-upstream/;
-        proxy_set_header   X-Real-IP $remote_addr;
-        proxy_set_header   Host $http_host;
-        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
+    return 301 https://$host$request_uri;  # enforce https
 }
 
 server {
@@ -20,8 +15,8 @@ server {
     server_name DOMAIN;
 
     ssl on;
-    ssl_certificate /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.crt;
-    ssl_certificate_key /var/lib/apps/subutai-mng/current/web/ssl/DOMAIN.key;
+    ssl_certificate /var/lib/apps/subutai/current/web/ssl/UNIXDATE.crt;
+    ssl_certificate_key /var/lib/apps/subutai/current/web/ssl/UNIXDATE.key;
 
     location / {
 	proxy_pass http://DOMAIN-upstream/;

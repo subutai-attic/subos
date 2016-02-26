@@ -4,26 +4,28 @@
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
 # creating default ovs bridge and ports durin lxc startup
-mng_vlan=$MNG_VLAN
-if [ "$mng_vlan" == "" ]; then
-        mng_vlan=200
+MNG_VLAN="$(cat /var/lib$SUBUTAI_APP_PREFIX/vlan)"
+if [ "$MNG_VLAN" == "" ]; then
+        MNG_VLAN=2
+	echo "$MNG_VLAN" > /var/lib$SUBUTAI_APP_PREFIX/vlan
 fi
+
 vlan="$(grep '#vlan_id' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 gateway="$(grep 'lxc.network.ipv4.gateway' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 
 if [ "$5" == "management" ]; then
-        ovs-vsctl --may-exist add-port wan $5 tag=$mng_vlan
-        ovs-vsctl --may-exist add-port wan mng-gw tag=$mng_vlan -- set interface mng-gw type=internal
+	ovs-vsctl --may-exist add-port wan $5
+	ovs-vsctl --may-exist add-port wan mng-gw -- set interface mng-gw type=internal
+	ovs-vsctl set port $5 tag=$MNG_VLAN
+	ovs-vsctl set port mng-gw tag=$MNG_VLAN
 	while [ "$( ifconfig -s | grep -c mng-gw )" != "1" ]; do
                 ifconfig mng-gw 10.10.10.254/24
                 sleep 1
         done
 
-        for i in 8101 8551 1099 43020 53647 8080 8883 8083 8086 8088 5005; do
-                iptables -t nat -A PREROUTING -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
+        for i in 8101 8551 1099 43020 53647 8883 8083 8086 8088 5005 8443 8444; do
+                iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
         done
-        iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 8443 -j DNAT --to-destination 10.10.10.1:8443
-        iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 8444 -j DNAT --to-destination 10.10.10.1:8444
         iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
 
         exit 0
@@ -31,6 +33,9 @@ elif [ "$vlan" ]; then
         ovs-vsctl --if-exists del-port wan $5
         ovs-vsctl --may-exist add-port wan gw-$vlan tag=$vlan -- set interface gw-$vlan type=internal
         ovs-vsctl add-port wan $5 tag=$vlan
+	of_port=$(ovs-ofctl queue-get-config wan gw-$vlan | cut -d"=" -f3)
+        ovs-ofctl add-flow wan "priority=2600,in_port=$of_port,ip,nw_src=$gateway actions=normal"
+	ovs-ofctl add-flow wan "priority=2500,in_port=$of_port,ip,nw_src=192.168.0.0/16 actions=drop"
         cat <<EOF > /writable/system-data/etc/network/interfaces.d/gw-$vlan
 allow-env gw-$vlan
 iface gw-$vlan inet static
@@ -38,7 +43,10 @@ iface gw-$vlan inet static
   netmask 255.255.255.0
 EOF
         ifconfig gw-$vlan $gateway
+	echo -e "\n$gateway	gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
 else
         ovs-vsctl --if-exists del-port lxc-br $5
         ovs-vsctl --may-exist add-port lxc-br $5
+	echo -e "\n10.10.0.254  gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
 fi
+

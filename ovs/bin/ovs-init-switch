@@ -24,11 +24,5 @@ if [ -f "/var/run/openvswitch/vswitchd.pid" ]; then
     fi
 fi
 
-#if [ "$SUBUTAI_APP_TYPE" == "subutai-mng" ]; then
-#	sed -i /writable/system-data/etc/network/interfaces.d/eth1 -e 's/dhcp/manual/g'
-#else
-#	sed -i /writable/system-data/etc/network/interfaces.d/eth0 -e 's/dhcp/manual/g'
-#fi
-
 init-br &
 ovs-vswitchd --pidfile=/var/run/openvswitch/vswitchd.pid --unixctl=/var/run/openvswitch/vswitch.ctl unix:/var/run/openvswitch/db.sock

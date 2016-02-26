@@ -6,12 +6,13 @@ set -e
 function build_usage {
 	echo -e "\nBuild, install and export Subutai Snappy"
 	echo -e "\nusage:"
-	echo "$0 -e|--export OUTPUT or v|--vm [ -p|--preserve ] or -b|--build"
+	echo "$0 -e|--export OUTPUT or v|--vm [ -p|--preserve ] or -b|--build -t|--tag"
 	echo "Arguments:"
 	echo "	-e|--export OUTPUT	- type of output file: \"ova\", \"box\" or \"both\". Assuming both by default. This option will rebuild temporary snap"
 	echo "	-b|--build		- just build snap package"
 	echo "	-v|--vm			- create and run preconfigured virtual machine. Th
 is command will rebuild temporary snap package and install it inside the VM"
+	echo "	-t|--tag		- setup Subutai Management VLAN tag. By default it is 200"
 	echo "	-p|--preserve		- if exist, re-use temporary snap"
 	echo "	-h|--help		- show this text"
 	echo -e "\n"
@@ -19,13 +20,16 @@ is command will rebuild temporary snap package and install it inside the VM"
 	exit 0
 }
 
-
 function snap_build {
 	rm -rf /tmp/tmpdir_subutai
 	mkdir -p /tmp/tmpdir_subutai
 	for i in $LIST; do
 		cp -r $i/* /tmp/tmpdir_subutai
 	done
+	if [ "$TAG" != "" ]; then
+		sed -i /tmp/tmpdir_subutai/bin/init-br -e "s/MNG_VLAN=2/MNG_VLAN=$TAG/g"
+		sed -i /tmp/tmpdir_subutai/bin/create_ovs_interface -e "s/MNG_VLAN=2/MNG_VLAN=$TAG/g"
+	fi
 	if [ "$BUILD" == "true" ]; then
 		echo "Building Subutai snap"
 		snappy build /tmp/tmpdir_subutai --output=$EXPORT_DIR/snap
@@ -39,7 +43,6 @@ function snap_build {
 	fi
 	rm -rf /tmp/tmpdir_subutai
 }
-
 
 function clone_vm {
 	echo "Creating clone"
@@ -106,7 +109,7 @@ function export_box {
 }
 
 function setup_var {
-        LIST="btrfs collectd curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq"
+        LIST="btrfs collectd curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq nginx"
        	CLONE=subutai-"$DATE"
 }
 
@@ -140,6 +143,10 @@ while [ $# -ge 1 ]; do
 	    ;;
 	    -p|--preserve)
 	    	PRESERVE="true"
+	    ;;
+	    -t|--tag)
+		TAG="$2"
+		shift
 	    ;;
 	    -h|--help)
 		build_usage
