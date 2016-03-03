@@ -55,6 +55,10 @@ services:
    security-template: unconfined
    description: "rngd service"
    start: bin/rngd -f -r /dev/urandom 
+ - name: lxcfs
+   security-template: unconfined
+   description: "lxcfs service"
+   start: bin/lxcfs-wrapper
 binaries:
  - exec: bin/update-subutai
    name: update-subutai
@@ -80,3 +84,4 @@ binaries:
       apparmor: meta/ovs-db.profile
       seccomp: meta/ovs-db.seccomp
    caps: []
+
