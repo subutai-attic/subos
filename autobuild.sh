@@ -120,7 +120,7 @@ VM="false"
 EXPORT_DIR="../export"
 DATE="$(date +%s)"
 
-if [ "$#" == "0" ]; then BUILD="true"; fi
+if [ "$#" == "0" ]; then VM="true"; fi
 
 while [ $# -ge 1 ]; do
 	key="$1"
