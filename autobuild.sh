@@ -109,7 +109,7 @@ function export_box {
 }
 
 function setup_var {
-        LIST="btrfs collectd curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq nginx"
+        LIST="btrfs collectd curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq nginx lxcfs"
        	CLONE=subutai-"$DATE"
 }
 
