@@ -4,8 +4,8 @@
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
 current="$(subutai -v | awk '{print $3}')"
-link="https://github.com$(curl -s -L https://github.com/subutai-io/Subutai-snappy/releases/latest | grep -E "download.*snap" | tail -1 | cut -d"\"" -f2)"
-version="https://github.com$(curl -s -L https://github.com/subutai-io/Subutai-snappy/releases/latest | grep -E "snap.*--")"
+link="https://github.com$(curl -s -L https://github.com/subutai-io/subos/releases/latest | grep -E "download.*snap" | tail -1 | cut -d"\"" -f2)"
+version="https://github.com$(curl -s -L https://github.com/subutai-io/subos/releases/latest | grep -E "snap.*--")"
 
 if [ "$(echo "$version" | grep -c "$current")" -eq "0" ]; then
 	echo "Updating Subutai Resource host"
