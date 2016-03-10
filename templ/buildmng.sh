@@ -2,7 +2,6 @@
 
 subutai clone master management
 cp subutai-*.tar.gz management.tar.gz /mnt/lib/lxc/management/home/subutai/
-lxc-attach -n management -- mkdir -p /var/lib/subutai-mng
 lxc-attach -n management -- /bin/bash -c "tar -C /opt/ -xzf /home/subutai/subutai-*.tar.gz"
 lxc-attach -n management -- /bin/bash -c "mv /opt/subutai-* /opt/subutai-mng"
 lxc-attach -n management -- tar -xzf /home/subutai/management.tar.gz
