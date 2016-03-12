@@ -17,8 +17,7 @@ secret = secret
 restToken = /rest/v1/identity/gettoken
 restPublicKey = /rest/v1/registration/public-key
 restVerify = /rest/v1/registration/verify/container-token
-kurjun = http://subutai.ddns.net:8081/rest/kurjun/templates
-cdn = cdn.helper.subutai.io
+cdn = kurjun.cdn.subutai.io
 
 [broker]
 port = 8883
