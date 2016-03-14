@@ -45,8 +45,8 @@ function check {
 }
 
 for name in $(ls /home/ubuntu/docker); do
-	UBUNTU=$(grep -i "from " /home/ubuntu/docker/riak/Dockerfile | head -n1 | grep -ic ubuntu)
-	DEBIAN=$(grep -i "from " /home/ubuntu/docker/riak/Dockerfile | head -n1 | grep -ic debian)
+	UBUNTU=$(grep -i "from " /home/ubuntu/docker/$name/Dockerfile | head -n1 | grep -ic ubuntu)
+	DEBIAN=$(grep -i "from " /home/ubuntu/docker/$name/Dockerfile | head -n1 | grep -ic debian)
 	if [ "$DEBIAN" == "1" ]; then
 		subutai clone debian $name	
 	elif [ "$UBUNTU" == "1" ]; then
