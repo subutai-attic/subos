@@ -11,7 +11,8 @@ function check {
 	name=$1
 	child="test`date +%s`"	
 	subutai clone $name $child
-	
+
+	if [ "$(subutai list -i $child | grep -c RUNNING)" == "0" ]; then return; fi	
 	IP=""
 	while [ "$IP" == "" ]; do
 		IP=$(lxc-attach -n $child -- ifconfig eth0 | grep "inet addr:" | cut -d: -f2 | awk '{print $1}')
@@ -28,7 +29,7 @@ function check {
 			STATUS=$(lxc-attach -n $child -- systemctl is-active docker2subutai.service)
         elif [ "$UBUNTU" == "1" ]; then
 			lxc-attach -n $child -- service docker2subutai status
-			STATUS=$(lxc-attach -n $child -- service docker2subutai status  | grep -c running)
+			STATUS=$(lxc-attach -n $child -- service docker2subutai status | grep -c running)
 		fi
 
 		echo $STATUS
@@ -71,6 +72,8 @@ for name in $(ls /home/ubuntu/docker); do
 	else
 		continue
 	fi
+
+    if [ "$(subutai list -i $name | grep -c RUNNING)" == "0" ]; then continue; fi
 
 	IP=""
 	while [ "$IP" == "" ]; do
