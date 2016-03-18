@@ -1,0 +1,7 @@
+  config.ssh.forward_agent = true
+  config.ssh.username = "ubuntu"
+  config.ssh.password = "ubuntu"
+  config.ssh.guest_port = 2022
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.network "forwarded_port", guest: 22, host: 2022
+  config.vm.network "forwarded_port", guest: 8443, host: 8443
