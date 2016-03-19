@@ -45,6 +45,15 @@ iface gw-$vlan inet static
 EOF
         ifconfig gw-$vlan $gateway
 	echo -e "\n$gateway	gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
+
+	envid=$(grep " $vlan " $SUBUTAI_DATA_PREFIX/var/subutai-network/vni_reserve | awk '{print $3}')
+	p2piface=$(grep "$envid" $SUBUTAI_DATA_PREFIX/var/subutai-network/p2p.txt | awk '{print $1}')
+	ipaddr=$(grep "lxc.network.ipv4 " /mnt/lib/lxc/$1/config | awk -F'[ /]' '{print $3}')
+	port=$(expr 10000 + `echo $ipaddr | cut -d'.' -f4`)
+	if [ "$p2piface" != "" ] && [ "$ipaddr" != "" ]; then
+		iptables -t nat -A PREROUTING -i $p2piface -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22
+	fi
+
 else
         ovs-vsctl --if-exists del-port lxc-br $5
         ovs-vsctl --may-exist add-port lxc-br $5
