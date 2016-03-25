@@ -13,7 +13,6 @@ function build_usage {
 	echo "	-v|--vm			- create and run preconfigured virtual machine. Th
 is command will rebuild temporary snap package and install it inside the VM"
 	echo "	-t|--tag		- setup Subutai Management VLAN tag. By default it is 200"
-	echo "	-p|--preserve		- if exist, re-use temporary snap"
 	echo "	-h|--help		- show this text"
 	echo -e "\n"
 
@@ -26,19 +25,15 @@ function snap_build {
 	for i in $LIST; do
 		cp -r $i/* /tmp/tmpdir_subutai
 	done
+	sed -i /tmp/tmpdir_subutai/meta/package.yaml -e "s/TIMESTAMP/$DATE/g"
 	if [ "$TAG" != "" ]; then
 		sed -i /tmp/tmpdir_subutai/bin/init-br -e "s/MNG_VLAN=2/MNG_VLAN=$TAG/g"
 		sed -i /tmp/tmpdir_subutai/bin/create_ovs_interface -e "s/MNG_VLAN=2/MNG_VLAN=$TAG/g"
 	fi
+	echo "Building Subutai snap"
 	if [ "$BUILD" == "true" ]; then
-		echo "Building Subutai snap"
-		snappy build /tmp/tmpdir_subutai --output=$EXPORT_DIR/snap
-	elif [ "$PRESERVE" == "false" ]; then
-		snappy build "/tmp/tmpdir_subutai" --output=/tmp
-	elif [ -f "/tmp/subutai_4.0.0_amd64.snap" ]; then
-		echo "Flag -p is set, using temporary snap"
+		snappy build "/tmp/tmpdir_subutai" --output=$EXPORT_DIR/snap
 	else
-                echo "Subutai temporary snap not found, rebuilding"
                 snappy build "/tmp/tmpdir_subutai" --output=/tmp
 	fi
 	rm -rf /tmp/tmpdir_subutai
@@ -73,7 +68,7 @@ function install_snap {
 	echo "Creating tmpfs"
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "mkdir tmpfs; sudo mount -t tmpfs -o size=1G tmpfs /home/ubuntu/tmpfs"
 	echo "Copying snap"
-	sshpass -p "ubuntu" scp -P4567 prepare-server.sh /tmp/subutai_4.0.0_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
+	sshpass -p "ubuntu" scp -P4567 prepare-server.sh /tmp/subutai_4.0.0-${DATE}_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
 	AUTOBUILD_IP=$(ifconfig `route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') 
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "sed -i \"s/IPPLACEHOLDER/$AUTOBUILD_IP/g\" /home/ubuntu/tmpfs/prepare-server.sh"
 	echo "Running install script"
@@ -115,7 +110,6 @@ function setup_var {
 
 EXPORT="false"
 BUILD="false"
-PRESERVE="false"
 VM="false"
 EXPORT_DIR="../export"
 DATE="$(date +%s)"
@@ -140,9 +134,6 @@ while [ $# -ge 1 ]; do
 	    ;;
 	    -v|--vm)
 	    	VM="true"
-	    ;;
-	    -p|--preserve)
-	    	PRESERVE="true"
 	    ;;
 	    -t|--tag)
 		TAG="$2"
