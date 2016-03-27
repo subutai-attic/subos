@@ -26,6 +26,7 @@ iface eth0 inet manual
 EOF
 dhclient -r eth0
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
+ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
 ovs-vsctl set port mng-net tag=$MNG_VLAN
 
 ovs-vsctl --may-exist add-br lxc-br
