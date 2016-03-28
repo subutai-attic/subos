@@ -45,6 +45,13 @@ iface gw-$vlan inet static
 EOF
         ifconfig gw-$vlan $gateway
 	echo -e "\n$gateway	gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
+
+	ipaddr=$(grep "lxc.network.ipv4 " /mnt/lib/lxc/$1/config | awk -F'[ /]' '{print $3}')
+	port=$(expr 10000 + `echo $ipaddr | cut -d'.' -f4`)
+	if [ "$ipaddr" != "" ]; then
+		iptables -t nat -A PREROUTING -i p2p-$vlan -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22
+	fi
+
 else
         ovs-vsctl --if-exists del-port lxc-br $5
         ovs-vsctl --may-exist add-port lxc-br $5

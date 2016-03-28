@@ -1,5 +1,4 @@
 [agent]
-version = 4.0.0
 gpgUser =
 gpgPassword = 12345678
 debug = true 
@@ -8,6 +7,7 @@ dataPrefix = /var/lib/apps/subutai/current/
 lxcPrefix = /mnt/lib/lxc/    
 
 [management]
+version = stable
 gpgUser =
 port = 8443
 host = 10.10.10.1
@@ -36,6 +36,6 @@ user = root
 pass = root
 db = metrics
 
-[misc]
+[template]
 version = 4.0.0
 arch = amd64

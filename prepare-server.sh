@@ -3,7 +3,7 @@
 echo -e "\nGatewayPorts yes" >> /etc/ssh/sshd_config
 bash -c "echo 180 > /sys/block/sda/device/timeout"
 bash -c "echo 180 > /sys/block/sdb/device/timeout"
-snappy install --allow-unauthenticated /home/ubuntu/tmpfs/subutai_4.0.0_amd64.snap
+snappy install --allow-unauthenticated /home/ubuntu/tmpfs/subutai_4.0.0-*_amd64.snap
 if [ "$(grep "gw.intra.lan" -c /etc/writable/hostname)" == "0" ]; then
         echo "rh`date +%s`.gw.intra.lan" > /etc/writable/hostname
 	hostname -F /etc/writable/hostname
