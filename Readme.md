@@ -3,15 +3,15 @@
 This repository contains all components of Subutai Social that required to build, deploy and run SS on Snappy Ubuntu.
 Content of this repo is binary files, compiled java application archives, configuration files, scripts, etc.
 
-Most common way to use this repo is to run `autobuild.sh` script with different flags: https://confluence.subutai.io/display/SNAP/Snappy+Subutai+autobuild+readme
+Most common way to use this repo is to run autobuild.sh script with different flags: https://confluence.subutai.io/display/SNAP/Snappy+Subutai+autobuild+readme
 
 ## Autobuild
 
 ### Description
-This is a short HOW-TO document that describes process of automatic Subutai snap packages generation and test environment creation "from the scratch" using `autobuild.sh` script.
+This is a short HOW-TO document that describes process of automatic Subutai snap packages generation and test environment creation "from the scratch" using autobuild.sh script.
 
 ### Installation
-Autobuild script provides different build options, such as building snaps, creating preconfigured virtual machines and exporting .ova and .box files. For each of this option, some requirements exist.
+Autobuild script provides different build options, such as building snaps, creating preconfigured virtual machines and exporting .ova and .box files. For each of this option, some requirements are exist.
 To simply build snap packages, you only need Snappy-tools installed on your Ubuntu. To install it, run:
 
     sudo add-apt-repository ppa:snappy-dev/tools
@@ -25,7 +25,7 @@ Install VirtualBox and sshpass:
  
 **VirtualBox requires virtualization support enabled on your CPU. If you don't know what is it and how to enable it, http://askubuntu.com/a/256853 - here is the askubuntu answer**
  
-Download snappy template from https://www.dropbox.com/s/jj28sgj9xlg3zew/snappy.ova?dl=0. Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but do not change disks configuration. Please make sure that virtual machines name is snappy and select existing network interface in network bridge configuration. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
+Download snappy template from https://www.dropbox.com/s/jj28sgj9xlg3zew/snappy.ova?dl=0. Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but, do not change disks configuration. Please make sure, that virtual machines name is snappy and select existing network interface in network bridge configuration. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
 
 **Do not start snappy virtual machine - this is a templates for our test servers**
  
@@ -50,12 +50,10 @@ Please note that autobuild script stores all output files in "../export" directo
 
 **./autobuild.sh -v**	start new virtual machine with installed Subutai package
 
-**./autobuild.sh -e box -p**	create Subutai vagrant box without rebuilding snap package if old one already exists
-
-When running with `-v` option, successfull completion of the script should display IP address of the newly created virtual machine. Please remember that IP address! This is the IP address of the host where you will deploy Subutai Management server.  
+**./autobuild.sh -e box -p**	create Subutai vagrant box without rebuilding snap package if old one is exist
 
 ## Deploying Subutai Management server
-Once you have host with installed Subutai package, login to that host and run the following command (no password should ba asked on login as ssh keys are exchanged, if that's not the case try `ubuntu/ubuntu` and file a bug report):
+Once you have host with installed Subutai package, you can run command
 
      sudo subutai import management
 
