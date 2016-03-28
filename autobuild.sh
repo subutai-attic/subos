@@ -100,7 +100,9 @@ function export_box {
 	
 	mv -f Vagrantfile .vagrant $dst
 
-	sed -i $dst/Vagrantfile -e 's/config\.ssh\.forward_agent = true/config\.ssh\.forward_agent = true\n  config\.ssh\.username = \"ubuntu\"\n  config\.vm\.synced_folder \"\.\", \"\/vagrant\", disabled: true\n  config\.vm\.network \"forwarded_port\", guest: 8181, host: 8181/g'
+	# inject.vagrant parameters into Vagrantfile
+	sed -e '/# config.vm.network "public_network"/ {' \
+		-e 'r inject.vagrant' -e 'd' -e '}' -i $dst/Vagrantfile
 }
 
 function setup_var {
