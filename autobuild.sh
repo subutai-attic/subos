@@ -81,7 +81,6 @@ function prepare_nic {
 	echo "Restoring network"
 	sleep 3
 	vboxmanage modifyvm $CLONE --nic4 none
-        vboxmanage modifyvm $CLONE --nic2 intnet 
         vboxmanage modifyvm $CLONE --nic1 bridged 
 }
 
