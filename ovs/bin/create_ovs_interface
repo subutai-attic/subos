@@ -39,6 +39,14 @@ elif [ "$vlan" ]; then
 	of_port=$(ovs-ofctl queue-get-config gw-$vlan gw-$vlan | cut -d"=" -f3)
         ovs-ofctl add-flow gw-$vlan "priority=2600,in_port=$of_port,ip,nw_src=$gateway actions=normal"
 	ovs-ofctl add-flow gw-$vlan "priority=2500,in_port=$of_port,ip,nw_src=192.168.0.0/16 actions=drop"
+
+	ovs-vsctl add-port wan pt-$vlan
+	ovs-vsctl add-port gw-$vlan patch-$vlan
+	ovs-vsctl set interface pt-$vlan type=patch
+	ovs-vsctl set interface patch-$vlan type=patch
+	ovs-vsctl set interface pt-$vlan options:peer=patch-$vlan
+	ovs-vsctl set interface patch-$vlan options:peer=pt-$vlan
+
         cat <<EOF > /writable/system-data/etc/network/interfaces.d/gw-$vlan
 allow-env gw-$vlan
 iface gw-$vlan inet static
