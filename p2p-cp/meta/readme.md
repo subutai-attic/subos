@@ -1,1 +1,1 @@
-P2P control peer service
+P2P control peer and DHT services

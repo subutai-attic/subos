@@ -8,3 +8,7 @@ services:
    security-template: unconfined
    description: "p2p-cp service"
    start: bin/cp
+ - name: p2p-dht
+   security-template: unconfined
+   description: "p2p-dht service"
+   start: bin/cp -dht 6881
