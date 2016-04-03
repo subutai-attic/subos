@@ -1,0 +1,18 @@
+#!/bin/bash
+#Include enviroment variables
+. $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+
+if [ "$1" != "" ]; then
+	kill $(ps ax | grep "[s]ubutai daemon" | awk '{print $1}')
+	exit
+fi
+
+while [ ! -S /sys/fs/cgroup/cgmanager/sock ]; do
+	sleep 1
+done
+
+while [ "$(ls $SUBUTAI_DATA_PREFIX/var/lxcfs/ | wc -l)" == "0" ]; do
+	sleep 1
+done
+
+/apps/subutai/current/bin/subutai daemon

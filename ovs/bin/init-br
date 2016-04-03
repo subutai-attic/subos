@@ -9,6 +9,7 @@ if [ "$MNG_VLAN" == "" ]; then
 fi
 
 mkdir -p /var/run/openvswitch/
+mkdir -p /var/lib/apps/subutai/current/var/subutai-network/
 
 while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	sleep 1
@@ -38,5 +39,3 @@ iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-f
 
 ifup -a --allow=env
 dhclient mng-net
-
-#$SUBUTAI_DATA_PREFIX/var/subutai-network/service-interface start
