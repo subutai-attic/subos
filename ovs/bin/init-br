@@ -39,5 +39,3 @@ iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-f
 
 ifup -a --allow=env
 dhclient mng-net
-
-#$SUBUTAI_DATA_PREFIX/var/subutai-network/service-interface start

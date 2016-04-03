@@ -30,6 +30,7 @@ services:
       seccomp: meta/subutai-agent.seccomp
    description: "Subutai-agent service"
    start: bin/agent-wrapper
+   stop: bin/agent-wrapper stop
  - name: ovs-init-db
    security-policy:
       apparmor: meta/ovs-db.profile
