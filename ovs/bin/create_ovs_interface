@@ -50,6 +50,9 @@ EOF
 	if [ "$ipaddr" != "" ]; then
 		iptables -t nat -A PREROUTING -i p2p-$vlan -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22
 	fi
+	of_port=$(ovs-ofctl queue-get-config gw-$vlan gw-$vlan | cut -d"=" -f3)
+        ovs-ofctl add-flow gw-$vlan "priority=2600,in_port=$of_port,ip,nw_src=$gateway actions=normal"
+        ovs-ofctl add-flow gw-$vlan "priority=2500,in_port=$of_port,ip,nw_src=192.168.0.0/16 actions=drop"
 
 else
         ovs-vsctl --if-exists del-port lxc-br $5
