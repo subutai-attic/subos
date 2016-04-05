@@ -7,7 +7,7 @@ dataPrefix = /var/lib/apps/subutai/current/
 lxcPrefix = /mnt/lib/lxc/    
 
 [management]
-version = stable
+version = dev
 gpgUser =
 port = 8443
 host = 10.10.10.1
