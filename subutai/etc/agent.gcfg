@@ -21,6 +21,7 @@ restVerify = /rest/v1/registration/verify/container-token
 [cdn]
 url = cdn.subut.ai
 sslport = 8338
+allowinsecure = false
 
 [influxdb]
 server = 10.10.10.1
