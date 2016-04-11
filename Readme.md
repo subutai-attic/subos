@@ -43,7 +43,7 @@ As we stated before, autobuild script can work in different modes. To change bui
 	-e | --export	create ova or box file from our snap packages
 	-p | --preserve	can be used with -v or -e flags to prevent rebuilding snap packages for virtual machine
 
-Please note that autobuild script stores all output files in "../export" directory, ie next to directory main
+Please note that autobuild script stores all output files in "../export" directory, i.e. next to directory main
 
 ### Examples:
 **./autobuild.sh -b**	build Subutai snap package that can be installed on Snappy Ubuntu
