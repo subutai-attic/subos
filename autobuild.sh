@@ -8,6 +8,7 @@ function build_usage {
 	echo -e "\nusage:"
 	echo "$0 -e|--export OUTPUT or v|--vm [ -p|--preserve ] or -b|--build -t|--tag"
 	echo "Arguments:"
+	echo "	-c|--config FILE	- deploy peers according to config in FILE"
 	echo "	-e|--export OUTPUT	- type of output file: \"ova\", \"box\" or \"both\". Assuming both by default. This option will rebuild temporary snap"
 	echo "	-b|--build		- just build snap package"
 	echo "	-v|--vm			- create and run preconfigured virtual machine. Th
@@ -112,6 +113,7 @@ function setup_var {
 
 EXPORT="false"
 BUILD="false"
+CONF="false"
 VM="false"
 EXPORT_DIR="../export"
 DATE="$(date +%s)"
@@ -133,6 +135,14 @@ while [ $# -ge 1 ]; do
 	    ;;
 	    -b|--build)
 	    	BUILD="true"
+	    ;;
+	    -c|--config)
+		if [[ -f "$2" ]]; then
+			CONF="$2"
+			shift
+		else
+			CONF="./peer.conf"
+		fi
 	    ;;
 	    -v|--vm)
 	    	VM="true"
@@ -170,5 +180,33 @@ if [ "$VM" == "true" -o "$EXPORT" != "false" ]; then
 	else
 		vboxmanage unregistervm --delete $CLONE
 	fi
-fi
 
+elif [ "$CONF" != "false" ]; then
+	peer=$(grep PEER $CONF | cut -d"=" -f2)
+	rh=$(grep RH $CONF | cut -d"=" -f2)
+
+	if [ "$peer" == "" ] || [ "$rh" == "" ]; then
+		echo "Invalid config"
+		exit 1
+	fi
+
+	echo "Erecting $peer(x${rh}RH) peer. Please wait"
+
+	i=0
+	while [ $i -lt $peer ]; do
+		j=0
+		vlan=$(shuf -i 1-4096 -n 1)
+		while [ $j -lt $rh ]; do
+			mhip=$($0 -v -t $vlan | grep "root@" | cut -d"@" -f2)
+			if [ $j -eq 0 ]; then 
+				ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $mhip
+				ssh -o StrictHostKeyChecking=no root@$mhip "/apps/subutai/current/bin/subutai import management"			
+				arr[$i]=$mhip
+			fi
+			let "j=j+1"
+		done
+		let "i=i+1"
+	done
+
+	echo -e "\\nManagement IPs: ${arr[*]}"
+fi
