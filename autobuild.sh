@@ -137,9 +137,9 @@ while [ $# -ge 1 ]; do
 	    	BUILD="true"
 	    ;;
 	    -d|--deploy)
-		if [[ -f "~/.peer.conf" ]]; then
+		if [[ -f ~/.peer.conf ]]; then
 			CONF="~/.peer.conf"
-		elif [[ -f "./.peer.conf" ]]; then
+		elif [[ -f ./.peer.conf ]]; then
 			CONF="./.peer.conf"
 		else
 			echo ".peer.conf file not found"
@@ -205,7 +205,7 @@ elif [ "$CONF" != "false" ]; then
 		while [ $j -lt $rh ]; do
 			mhip=$($0 -v -t $vlan | grep "root@" | cut -d"@" -f2)
 			if [ $j -eq 0 ]; then 
-				ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $mhip
+				ssh-keygen -f ~/.ssh/known_hosts -R $mhip
 				ssh -o StrictHostKeyChecking=no root@$mhip "/apps/subutai/current/bin/subutai import management"			
 				if [ "$DEB" != "" ]; then
 					sshpass -p "ubuntu" scp -o StrictHostKeyChecking=no -P2222 $DEB root@$mhip:~
