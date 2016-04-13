@@ -8,7 +8,7 @@ function build_usage {
 	echo -e "\nusage:"
 	echo "$0 -e|--export OUTPUT or v|--vm [ -p|--preserve ] or -b|--build -t|--tag"
 	echo "Arguments:"
-	echo "	-c|--config FILE	- deploy peers according to config in FILE"
+	echo "	-d|--deploy DEB		- deploy peers according to config in ~/.peer.conf or ./.peer.conf and install DEB inside SS management"
 	echo "	-e|--export OUTPUT	- type of output file: \"ova\", \"box\" or \"both\". Assuming both by default. This option will rebuild temporary snap"
 	echo "	-b|--build		- just build snap package"
 	echo "	-v|--vm			- create and run preconfigured virtual machine. Th
@@ -136,12 +136,18 @@ while [ $# -ge 1 ]; do
 	    -b|--build)
 	    	BUILD="true"
 	    ;;
-	    -c|--config)
-		if [[ -f "$2" ]]; then
-			CONF="$2"
-			shift
+	    -d|--deploy)
+		if [[ -f "~/.peer.conf" ]]; then
+			CONF="~/.peer.conf"
+		elif [[ -f "./.peer.conf" ]]; then
+			CONF="./.peer.conf"
 		else
-			CONF="./peer.conf"
+			echo ".peer.conf file not found"
+			exit 1
+		fi
+		if [[ -f "$2" ]]; then
+			DEB="$2"
+			shift
 		fi
 	    ;;
 	    -v|--vm)
@@ -201,6 +207,10 @@ elif [ "$CONF" != "false" ]; then
 			if [ $j -eq 0 ]; then 
 				ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $mhip
 				ssh -o StrictHostKeyChecking=no root@$mhip "/apps/subutai/current/bin/subutai import management"			
+				if [ "$DEB" != "" ]; then
+					sshpass -p "ubuntu" scp -o StrictHostKeyChecking=no -P2222 $DEB root@$mhip:~
+					sshpass -p "ubuntu" ssh	-o StrictHostKeyChecking=no -p2222 root@$mhip "dpkg -i ~/$(basename $DEB)"
+				fi
 				arr[$i]=$mhip
 			fi
 			let "j=j+1"
