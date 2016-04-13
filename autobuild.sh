@@ -137,9 +137,9 @@ while [ $# -ge 1 ]; do
 	    	BUILD="true"
 	    ;;
 	    -d|--deploy)
-		if [[ -f "~/.peer.conf" ]]; then
+		if [[ -f ~/.peer.conf ]]; then
 			CONF="~/.peer.conf"
-		elif [[ -f "./.peer.conf" ]]; then
+		elif [[ -f ./.peer.conf ]]; then
 			CONF="./.peer.conf"
 		else
 			echo ".peer.conf file not found"
