@@ -11,6 +11,10 @@ echo "echo \"server {
 	listen 8339 ssl;
 	ssl_certificate /opt/subutai-mng/certs/influxcert.pem;
 	ssl_certificate_key /opt/subutai-mng/certs/influxkey.pem;
+	proxy_connect_timeout       10;
+        proxy_send_timeout          3600;
+        proxy_read_timeout          3600;
+        send_timeout                3600;
 	location / {proxy_pass http://127.0.0.1:8333;}
 }\" > /etc/nginx/sites-enabled/default" >> /mnt/lib/lxc/management/opt/subutai-mng/bin/certgen
 echo "service nginx restart" >> /mnt/lib/lxc/management/opt/subutai-mng/bin/certgen
