@@ -12,8 +12,7 @@ sysctl -w net.ipv4.ip_forward=1
 sysctl -w net.ipv4.conf.all.forwarding=1
 
 if [ "$(grep "gw.intra.lan" -c /etc/writable/hostname)" == "0" ]; then
-	echo "rh`date +%s`.gw.intra.lan" > /etc/writable/hostname
-        hostname -F /etc/writable/hostname
+	hostnamectl set-hostname "rh`date +%s`.gw.intra.lan"
 fi
 
 while [ ! -f $SUBUTAI_APP_PREFIX/etc/ovs/vswitch.ovsschema ]; do
