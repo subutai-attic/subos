@@ -48,7 +48,12 @@ EOF
 	ipaddr=$(grep "lxc.network.ipv4 " /mnt/lib/lxc/$1/config | awk -F'[ /]' '{print $3}')
 	port=$(expr 10000 + `echo $ipaddr | cut -d'.' -f4`)
 	if [ "$ipaddr" != "" ]; then
-		iptables -t nat -A PREROUTING -i p2p$vlan -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22
+		for i in {1..10}; do
+			if [ "$(iptables-save | grep -c "A PREROUTING -i p2p$vlan -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22")" != "0" ]; then
+				break
+			fi
+			iptables -t nat -A PREROUTING -i p2p$vlan -p tcp -m tcp --dport $port -j DNAT --to-destination $ipaddr:22
+		done
 	fi
 	of_port=$(ovs-ofctl queue-get-config gw-$vlan gw-$vlan | cut -d"=" -f3)
         ovs-ofctl add-flow gw-$vlan "priority=2600,in_port=$of_port,ip,nw_src=10.10.10.1 actions=normal"
