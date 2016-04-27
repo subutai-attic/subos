@@ -7,7 +7,6 @@ dataPrefix = /var/lib/apps/subutai/current/
 lxcPrefix = /mnt/lib/lxc/    
 
 [management]
-version = stable
 gpgUser =
 port = 8443
 host = 10.10.10.1
@@ -17,18 +16,11 @@ secret = secret
 restToken = /rest/v1/identity/gettoken
 restPublicKey = /rest/v1/registration/public-key
 restVerify = /rest/v1/registration/verify/container-token
-cdn = cdn.subut.ai
 
-[broker]
-port = 8883
-password = client
-url = ssl://10.10.10.1
-responseTopic = RESPONSE_TOPIC
-executeTimeout = EXECUTE_TIMEOUT
-BroadcastTopic = BROADCAST_TOPIC
-heartbeatTopic = HEARTBEAT_TOPIC
-executeResponce = EXECUTE_RESPONSE
-executeTerminated = EXECUTE_TERMINATED
+[cdn]
+url = cdn.subut.ai
+sslport = 8338
+allowinsecure = false
 
 [influxdb]
 server = 10.10.10.1
@@ -38,4 +30,5 @@ db = metrics
 
 [template]
 version = 4.0.0
+branch = master
 arch = amd64
