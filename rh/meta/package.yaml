@@ -1,5 +1,5 @@
 name: subutai
-version: 4.0.0
+version: 4.0.0-TIMESTAMP
 architecture: amd64
 vendor: SSF <info@subutai.io>
 type: framework
@@ -29,7 +29,7 @@ services:
       apparmor: meta/subutai-agent.profile
       seccomp: meta/subutai-agent.seccomp
    description: "Subutai-agent service"
-   start: bin/subutai daemon
+   start: bin/agent-wrapper
  - name: ovs-init-db
    security-policy:
       apparmor: meta/ovs-db.profile
@@ -55,6 +55,10 @@ services:
    security-template: unconfined
    description: "rngd service"
    start: bin/rngd -f -r /dev/urandom 
+ - name: lxcfs
+   security-template: unconfined
+   description: "lxcfs service"
+   start: bin/lxcfs-wrapper
 binaries:
  - exec: bin/update-subutai
    name: update-subutai
@@ -80,3 +84,4 @@ binaries:
       apparmor: meta/ovs-db.profile
       seccomp: meta/ovs-db.seccomp
    caps: []
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+# make dir for lxcfs
+mkdir -p ${SNAP_APP_DATA_PATH}/var/lxcfs
+
+exec ${SNAP_APP_PATH}/bin/lxcfs ${SNAP_APP_DATA_PATH}/var/lxcfs

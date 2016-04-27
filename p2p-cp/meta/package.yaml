@@ -1,0 +1,14 @@
+name: p2p-cp
+version: 4.0.0
+architecture: amd64
+vendor: SSF <info@subutai.io>
+type: framework
+services:
+ - name: p2p-cp 
+   security-template: unconfined
+   description: "p2p-cp service"
+   start: bin/cp
+ - name: p2p-dht
+   security-template: unconfined
+   description: "p2p-dht service"
+   start: bin/cp -dht 6881

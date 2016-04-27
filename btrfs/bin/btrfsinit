@@ -21,9 +21,6 @@ umount /mnt
 systemctl start mnt.mount
 systemctl enable mnt.mount
 
-mkdir -p /mnt/lib/lxc
-btrfs subvolume create /mnt/lib/lxc/lxc
-btrfs subvolume create /mnt/lib/lxc/lxc-data
-btrfs subvolume create /mnt/lib/lxc/lxc-data/tmpdir
+mkdir -p /mnt/lib/lxc/tmpdir
 
 btrfs quota enable /mnt
