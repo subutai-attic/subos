@@ -25,7 +25,7 @@ Install VirtualBox and sshpass:
  
 **VirtualBox requires virtualization support enabled on your CPU. If you don't know what is it and how to enable it, http://askubuntu.com/a/256853 - here is the askubuntu answer**
  
-Download snappy template from https://www.dropbox.com/s/jj28sgj9xlg3zew/snappy.ova?dl=0. Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but, do not change disks configuration. Please make sure, that virtual machines name is snappy and select existing network interface in network bridge configuration. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
+Download snappy template from https://cdn.subut.ai:8338/kurjun/rest/file/get?name=snappy.ova. Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but, do not change disks configuration. Please make sure, that virtual machines name is snappy and select existing network interface in network bridge configuration. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
 
 **Do not start snappy virtual machine - this is a templates for our test servers**
  
