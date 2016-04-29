@@ -11,7 +11,7 @@ while [ ! -S /sys/fs/cgroup/cgmanager/sock ]; do
 	sleep 1
 done
 
-while [ "$(ls $SUBUTAI_DATA_PREFIX/var/lxcfs/ | wc -l)" == "0" ]; do
+while [ "$(ls $SUBUTAI_DATA_PREFIX/var/lib/lxcfs/ | wc -l)" == "0" ]; do
 	sleep 1
 done
 
