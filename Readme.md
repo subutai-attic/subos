@@ -3,8 +3,6 @@
 This repository contains all components of Subutai Social that required to build, deploy and run SS on Snappy Ubuntu.
 Content of this repo is binary files, compiled java application archives, configuration files, scripts, etc.
 
-Most common way to use this repo is to run autobuild.sh script with different flags: https://confluence.subutai.io/display/SNAP/Snappy+Subutai+autobuild+readme
-
 ## Autobuild
 
 ### Description
@@ -27,9 +25,9 @@ Install VirtualBox and sshpass:
  
 Download snappy template from https://cdn.subut.ai:8338/kurjun/rest/file/get?name=snappy.ova. Double-click on snappy.ova and you'll see import dialogue. You can customize VM's configuration according to your hardware, but, do not change disks configuration. Please make sure, that virtual machines name is snappy and select existing network interface in network bridge configuration. Also, you should check "Reinitialize the MAC address of all network cards" and finish by clicking "Import".
 
-**Do not start snappy virtual machine - this is a templates for our test servers**
+**Do not start snappy virtual machine - this is a templates for your test servers**
  
-After this you should clone Snappy Subutai repo from Stash: 
+After this you should clone Snappy Subutai repo:
 
     git clone git@github.com:subutai-io/Subutai-snappy.git 
 

@@ -58,10 +58,11 @@ am_in_userns() {
 in_userns=0
 [ $(am_in_userns) = "yes" ] && in_userns=1
 
+# Allow the cache base to be set by environment variable
 if [ $(id -u) -eq 0 ]; then
-    CACHE_D="/mnt/cache/lxc/cirros"
+    CACHE_D=${LXC_CACHE_PATH:-"/mnt/cache/lxc/cirros"}
 else
-    CACHE_D="$HOME/.cache/lxc/cirros"
+    CACHE_D=${LXC_CACHE_PATH:-"$HOME/.cache/lxc/cirros"}
 fi
 
 error() { echo "$@" 1>&2; }
@@ -129,8 +130,6 @@ lxc.cap.drop = sys_module mac_admin mac_override sys_time
 
 # When using LXC with apparmor, uncomment the next line to run unconfined:
 #lxc.aa_profile = unconfined
-# To support container nesting on an Ubuntu host, uncomment next two lines:
-#lxc.aa_profile = lxc-container-default-with-nesting
 lxc.mount.auto = cgroup:mixed proc:mixed sys:mixed
 
 lxc.cgroup.devices.deny = a

@@ -6,7 +6,7 @@ rootfsmountdir=/apps/subutai/current/lib/lxc/rootfs
 
 Name: lxc
 Description: linux container tools
-Version: 1.1.5
+Version: 2.0.0
 URL: http://linuxcontainers.org
 Libs: -L${libdir} -llxc -lutil
 Cflags: -I${includedir}
