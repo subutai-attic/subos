@@ -40,7 +40,6 @@ function snap_build {
 		if [ "$BUILD" == "true" ]; then
 			mkdir -p $EXPORT_DIR/snap
 			sshpass -p "ubuntu" scp -P4567 ubuntu@localhost:/home/ubuntu/tmpfs/subutai*.snap $EXPORT_DIR/snap
-			exit 1
 		else
 			sshpass -p "ubuntu" scp -P4567 ubuntu@localhost:/home/ubuntu/tmpfs/subutai*.snap /tmp
 		fi
