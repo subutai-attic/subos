@@ -11,8 +11,7 @@ function build_usage {
 	echo "	-d|--deploy DEB		- deploy peers according to config in ~/.peer.conf or ./.peer.conf and install DEB inside SS management"
 	echo "	-e|--export OUTPUT	- type of output file: \"ova\", \"box\" or \"both\". Assuming both by default. This option will rebuild temporary snap"
 	echo "	-b|--build		- just build snap package"
-	echo "	-v|--vm			- create and run preconfigured virtual machine. Th
-is command will rebuild temporary snap package and install it inside the VM"
+	echo "	-v|--vm			- create and run preconfigured virtual machine. This command will rebuild temporary snap package and install it inside the VM"
 	echo "	-t|--tag		- setup Subutai Management VLAN tag. By default it is 200"
 	echo "	-h|--help		- show this text"
 	echo -e "\n"
@@ -32,13 +31,26 @@ function snap_build {
 		sed -i /tmp/tmpdir_subutai/bin/create_ovs_interface -e "s/MNG_VLAN=2/MNG_VLAN=$TAG/g"
 	fi
 	echo "Building Subutai snap"
-	if [ "$BUILD" == "true" ]; then
+	if [ "$(which snappy)" == "" ]; then
+		pushd /tmp
+		tar czf /tmp/snap.tgz tmpdir_subutai
+		popd
+		sshpass -p "ubuntu" scp -P4567 /tmp/snap.tgz ubuntu@localhost:/home/ubuntu/tmpfs/
+		sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "cd /home/ubuntu/tmpfs && tar zxf snap.tgz && cd tmpdir_subutai && snappy build && mv *.snap .."
+		if [ "$BUILD" == "true" ]; then
+			mkdir -p $EXPORT_DIR/snap
+			sshpass -p "ubuntu" scp -P4567 ubuntu@localhost:/home/ubuntu/tmpfs/subutai*.snap $EXPORT_DIR/snap
+		else
+			sshpass -p "ubuntu" scp -P4567 ubuntu@localhost:/home/ubuntu/tmpfs/subutai*.snap /tmp
+		fi
+	elif [ "$BUILD" == "true" ]; then
 		snappy build "/tmp/tmpdir_subutai" --output=$EXPORT_DIR/snap
 	else
-                snappy build "/tmp/tmpdir_subutai" --output=/tmp
+		snappy build "/tmp/tmpdir_subutai" --output=/tmp
 	fi
 	rm -rf /tmp/tmpdir_subutai
 }
+
 
 function clone_vm {
 	echo "Creating clone"
@@ -69,6 +81,9 @@ function install_snap {
 	echo "Creating tmpfs"
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "mkdir tmpfs; sudo mount -t tmpfs -o size=1G tmpfs /home/ubuntu/tmpfs"
 	echo "Copying snap"
+	if [ "$(which snappy)" == "" ]; then
+		snap_build
+	fi
 	sshpass -p "ubuntu" scp -P4567 prepare-server.sh /tmp/subutai_4.0.0-${DATE}_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
 	AUTOBUILD_IP=$(ifconfig `route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') 
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "sed -i \"s/IPPLACEHOLDER/$AUTOBUILD_IP/g\" /home/ubuntu/tmpfs/prepare-server.sh"
@@ -165,7 +180,11 @@ while [ $# -ge 1 ]; do
 done
 
 setup_var
-snap_build
+if [ "$(which snappy)" == "" ]; then
+	VM="true"
+else
+	snap_build
+fi
 
 if [ "$VM" == "true" -o "$EXPORT" != "false" ]; then
 	clone_vm
