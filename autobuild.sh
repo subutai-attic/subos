@@ -57,6 +57,7 @@ function clone_vm {
 	vboxmanage clonevm --register --name $CLONE snappy 
 	vboxmanage modifyvm $CLONE --nic1 none
 	vboxmanage modifyvm $CLONE --nic2 none
+	vboxmanage modifyvm $CLONE --nic3 none
 	vboxmanage modifyvm $CLONE --nic4 nat
 	vboxmanage modifyvm $CLONE --cableconnected4 on
 	vboxmanage modifyvm $CLONE --natpf4 "ssh-fwd,tcp,,4567,,22"
@@ -96,8 +97,18 @@ function prepare_nic {
 	vboxmanage controlvm $CLONE poweroff
 	echo "Restoring network"
 	sleep 3
+
+	if [ "$(vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1 >/dev/null; echo $?)" == "1" ]; then
+		vboxmanage hostonlyif create
+		vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1
+		vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200
+		vboxmanage dhcpserver modify --ifname vboxnet0 --enable
+	fi
+
 	vboxmanage modifyvm $CLONE --nic4 none
-        vboxmanage modifyvm $CLONE --nic1 bridged 
+	vboxmanage modifyvm $CLONE --nic3 none
+	vboxmanage modifyvm $CLONE --nic2 hostonly
+        vboxmanage modifyvm $CLONE --nic1 nat
 }
 
 function export_ova {
