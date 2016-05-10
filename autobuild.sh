@@ -113,6 +113,7 @@ function prepare_nic {
 		vboxmanage modifyvm $CLONE --nic1 bridged
 	else
 		vboxmanage modifyvm $CLONE --nic2 hostonly
+		vboxmanage modifyvm $CLONE --hostonlyadapter2 vboxnet0
 	        vboxmanage modifyvm $CLONE --nic1 nat
 	fi
 }
