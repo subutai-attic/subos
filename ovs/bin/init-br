@@ -20,7 +20,11 @@ ovs-vsctl --may-exist add-port wan eth0
 ifconfig eth0 0 && dhclient wan
 ifconfig eth1 up && dhclient eth1
 if [ "$AUTOBUILD_IP" != "" ]; then
-	echo $(ifconfig eth1 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') | nc $AUTOBUILD_IP 48723
+	IP=$(ifconfig eth1 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+	if [ "$IP" == "" ]; then
+		IP=$(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+	fi
+	echo $IP | nc $AUTOBUILD_IP 48723
 fi
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
 allow-hotplug eth0

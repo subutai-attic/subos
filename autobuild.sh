@@ -14,6 +14,7 @@ function build_usage {
 	echo "	-v|--vm			- create and run preconfigured virtual machine. This command will rebuild temporary snap package and install it inside the VM"
 	echo "	-t|--tag		- setup Subutai Management VLAN tag. By default it is 200"
 	echo "	-h|--help		- show this text"
+	echo "	-bridge			- Create VM with bridged network"
 	echo -e "\n"
 
 	exit 0
@@ -107,8 +108,13 @@ function prepare_nic {
 
 	vboxmanage modifyvm $CLONE --nic4 none
 	vboxmanage modifyvm $CLONE --nic3 none
-	vboxmanage modifyvm $CLONE --nic2 hostonly
-        vboxmanage modifyvm $CLONE --nic1 nat
+        if [ "$BRIDGEMODE" == "true" ]; then
+		vboxmanage modifyvm $CLONE --nic2 none
+		vboxmanage modifyvm $CLONE --nic1 bridged
+	else
+		vboxmanage modifyvm $CLONE --nic2 hostonly
+	        vboxmanage modifyvm $CLONE --nic1 nat
+	fi
 }
 
 function export_ova {
@@ -137,6 +143,7 @@ function setup_var {
        	CLONE=subutai-"$DATE"
 }
 
+BRIDGEMODE="false"
 EXPORT="false"
 BUILD="false"
 CONF="false"
@@ -161,6 +168,9 @@ while [ $# -ge 1 ]; do
 	    ;;
 	    -b|--build)
 	    	BUILD="true"
+	    ;;
+	    -bridge)
+		BRIDGEMODE="true"
 	    ;;
 	    -d|--deploy)
 		if [[ -f ~/.peer.conf ]]; then
