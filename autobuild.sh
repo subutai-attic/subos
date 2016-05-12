@@ -14,6 +14,7 @@ function build_usage {
 	echo "	-v|--vm			- create and run preconfigured virtual machine. This command will rebuild temporary snap package and install it inside the VM"
 	echo "	-t|--tag		- setup Subutai Management VLAN tag. By default it is 200"
 	echo "	-h|--help		- show this text"
+	echo "	-n|--nat		- Create VM with NAT network"
 	echo -e "\n"
 
 	exit 0
@@ -57,6 +58,7 @@ function clone_vm {
 	vboxmanage clonevm --register --name $CLONE snappy 
 	vboxmanage modifyvm $CLONE --nic1 none
 	vboxmanage modifyvm $CLONE --nic2 none
+	vboxmanage modifyvm $CLONE --nic3 none
 	vboxmanage modifyvm $CLONE --nic4 nat
 	vboxmanage modifyvm $CLONE --cableconnected4 on
 	vboxmanage modifyvm $CLONE --natpf4 "ssh-fwd,tcp,,4567,,22"
@@ -96,8 +98,24 @@ function prepare_nic {
 	vboxmanage controlvm $CLONE poweroff
 	echo "Restoring network"
 	sleep 3
+
+	if [ "$(vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1 >/dev/null; echo $?)" == "1" ]; then
+		vboxmanage hostonlyif create
+		vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1
+		vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200
+		vboxmanage dhcpserver modify --ifname vboxnet0 --enable
+	fi
+
 	vboxmanage modifyvm $CLONE --nic4 none
-        vboxmanage modifyvm $CLONE --nic1 bridged 
+	vboxmanage modifyvm $CLONE --nic3 none
+        if [ "$BRIDGEMODE" == "true" ]; then
+		vboxmanage modifyvm $CLONE --nic2 none
+		vboxmanage modifyvm $CLONE --nic1 bridged
+	else
+		vboxmanage modifyvm $CLONE --nic2 hostonly
+		vboxmanage modifyvm $CLONE --hostonlyadapter2 vboxnet0
+	        vboxmanage modifyvm $CLONE --nic1 nat
+	fi
 }
 
 function export_ova {
@@ -126,6 +144,7 @@ function setup_var {
        	CLONE=subutai-"$DATE"
 }
 
+BRIDGEMODE="true"
 EXPORT="false"
 BUILD="false"
 CONF="false"
@@ -150,6 +169,9 @@ while [ $# -ge 1 ]; do
 	    ;;
 	    -b|--build)
 	    	BUILD="true"
+	    ;;
+	    -n|--nat)
+		BRIDGEMODE="false"
 	    ;;
 	    -d|--deploy)
 		if [[ -f ~/.peer.conf ]]; then

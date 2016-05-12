@@ -26,8 +26,10 @@ if [ "$5" == "management" ]; then
 
         for i in 5005 8443 8444; do
                 iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
+                iptables -t nat -A PREROUTING -i eth1 -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
         done
         iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
+        iptables -t nat -A PREROUTING -i eth1 -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22
 
         exit 0
 elif [ "$vlan" ]; then
