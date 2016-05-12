@@ -14,7 +14,7 @@ function build_usage {
 	echo "	-v|--vm			- create and run preconfigured virtual machine. This command will rebuild temporary snap package and install it inside the VM"
 	echo "	-t|--tag		- setup Subutai Management VLAN tag. By default it is 200"
 	echo "	-h|--help		- show this text"
-	echo "	-bridge			- Create VM with bridged network"
+	echo "	-n|--nat		- Create VM with NAT network"
 	echo -e "\n"
 
 	exit 0
@@ -144,7 +144,7 @@ function setup_var {
        	CLONE=subutai-"$DATE"
 }
 
-BRIDGEMODE="false"
+BRIDGEMODE="true"
 EXPORT="false"
 BUILD="false"
 CONF="false"
@@ -170,8 +170,8 @@ while [ $# -ge 1 ]; do
 	    -b|--build)
 	    	BUILD="true"
 	    ;;
-	    -bridge)
-		BRIDGEMODE="true"
+	    -n|--nat)
+		BRIDGEMODE="false"
 	    ;;
 	    -d|--deploy)
 		if [[ -f ~/.peer.conf ]]; then
