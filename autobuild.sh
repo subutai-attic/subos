@@ -107,15 +107,11 @@ function prepare_nic {
 	fi
 
 	vboxmanage modifyvm $CLONE --nic4 none
-	vboxmanage modifyvm $CLONE --nic3 none
-        if [ "$BRIDGEMODE" == "true" ]; then
-		vboxmanage modifyvm $CLONE --nic2 none
-		vboxmanage modifyvm $CLONE --nic1 bridged
-	else
-		vboxmanage modifyvm $CLONE --nic2 hostonly
-		vboxmanage modifyvm $CLONE --hostonlyadapter2 vboxnet0
-	        vboxmanage modifyvm $CLONE --nic1 nat
-	fi
+	vboxmanage modifyvm $CLONE --nic3 bridged
+	vboxmanage modifyvm $CLONE --bridgeadapter3 $(route -n | grep ^0.0.0.0 | awk '{print $8}')
+	vboxmanage modifyvm $CLONE --nic2 hostonly
+	vboxmanage modifyvm $CLONE --hostonlyadapter2 vboxnet0
+	vboxmanage modifyvm $CLONE --nic1 nat
 }
 
 function export_ova {
