@@ -99,7 +99,7 @@ function prepare_nic {
 	echo "Restoring network"
 	sleep 3
 
-	if [ "$(vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1 >/dev/null; echo $?)" == "1" ]; then
+	if [ "$(vboxmanage list -l hostonlyifs | grep -c vboxnet0)" == "0" ]; then
 		vboxmanage hostonlyif create
 		vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1
 		vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200
