@@ -99,12 +99,14 @@ function prepare_nic {
 	echo "Restoring network"
 	sleep 3
 
-	if [ "$(vboxmanage list -l hostonlyifs | grep -c vboxnet0)" == "0" ]; then
+	if [ "$(vboxmanage list hostonlyifs | grep -c vboxnet0)" == "0" ]; then
 		vboxmanage hostonlyif create
-		vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1
-		vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200
-		vboxmanage dhcpserver modify --ifname vboxnet0 --enable
 	fi
+	vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1
+	if [ "$(vboxmanage list dhcpservers | grep -c vboxnet0)" == "0" ]; then
+		vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200
+	fi
+	vboxmanage dhcpserver modify --ifname vboxnet0 --enable
 
 	vboxmanage modifyvm $CLONE --nic4 none
 	vboxmanage modifyvm $CLONE --nic3 bridged
