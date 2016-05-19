@@ -14,6 +14,7 @@ function build_usage {
 	echo "	-v|--vm			- create and run preconfigured virtual machine. This command will rebuild temporary snap package and install it inside the VM"
 	echo "	-t|--tag		- setup Subutai Management VLAN tag. By default it is 200"
 	echo "	-h|--help		- show this text"
+	echo "	-n|--nat		- Create VM with NAT network"
 	echo -e "\n"
 
 	exit 0
@@ -57,6 +58,7 @@ function clone_vm {
 	vboxmanage clonevm --register --name $CLONE snappy 
 	vboxmanage modifyvm $CLONE --nic1 none
 	vboxmanage modifyvm $CLONE --nic2 none
+	vboxmanage modifyvm $CLONE --nic3 none
 	vboxmanage modifyvm $CLONE --nic4 nat
 	vboxmanage modifyvm $CLONE --cableconnected4 on
 	vboxmanage modifyvm $CLONE --natpf4 "ssh-fwd,tcp,,4567,,22"
@@ -85,7 +87,7 @@ function install_snap {
 		snap_build
 	fi
 	sshpass -p "ubuntu" scp -P4567 prepare-server.sh /tmp/subutai_4.0.0-${DATE}_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
-	AUTOBUILD_IP=$(ifconfig `route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') 
+	AUTOBUILD_IP=$(/sbin/ifconfig `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') 
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "sed -i \"s/IPPLACEHOLDER/$AUTOBUILD_IP/g\" /home/ubuntu/tmpfs/prepare-server.sh"
 	echo "Running install script"
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p4567 "sudo /home/ubuntu/tmpfs/prepare-server.sh"
@@ -96,8 +98,22 @@ function prepare_nic {
 	vboxmanage controlvm $CLONE poweroff
 	echo "Restoring network"
 	sleep 3
+
+	if [ "$(vboxmanage list hostonlyifs | grep -c vboxnet0)" == "0" ]; then
+		vboxmanage hostonlyif create
+	fi
+	vboxmanage hostonlyif ipconfig vboxnet0 --ip 192.168.56.1
+	if [ "$(vboxmanage list dhcpservers | grep -c vboxnet0)" == "0" ]; then
+		vboxmanage dhcpserver add --ifname vboxnet0 --ip 192.168.56.1 --netmask 255.255.255.0 --lowerip 192.168.56.100 --upperip 192.168.56.200
+	fi
+	vboxmanage dhcpserver modify --ifname vboxnet0 --enable
+
 	vboxmanage modifyvm $CLONE --nic4 none
-        vboxmanage modifyvm $CLONE --nic1 bridged 
+	vboxmanage modifyvm $CLONE --nic3 bridged
+	vboxmanage modifyvm $CLONE --bridgeadapter3 $(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')
+	vboxmanage modifyvm $CLONE --nic2 hostonly
+	vboxmanage modifyvm $CLONE --hostonlyadapter2 vboxnet0
+	vboxmanage modifyvm $CLONE --nic1 nat
 }
 
 function export_ova {
@@ -126,6 +142,7 @@ function setup_var {
        	CLONE=subutai-"$DATE"
 }
 
+BRIDGEMODE="true"
 EXPORT="false"
 BUILD="false"
 CONF="false"
@@ -150,6 +167,9 @@ while [ $# -ge 1 ]; do
 	    ;;
 	    -b|--build)
 	    	BUILD="true"
+	    ;;
+	    -n|--nat)
+		BRIDGEMODE="false"
 	    ;;
 	    -d|--deploy)
 		if [[ -f ~/.peer.conf ]]; then

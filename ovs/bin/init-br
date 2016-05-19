@@ -18,13 +18,29 @@ done
 ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
 ovs-vsctl --may-exist add-port wan eth0
 ifconfig eth0 0 && dhclient wan
+for i in {1..2}; do ifconfig eth$i up && timeout 10 dhclient eth$i; done
+
 if [ "$AUTOBUILD_IP" != "" ]; then
-	echo $(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') | nc $AUTOBUILD_IP 48723
+	for i in eth2 eth1 wan; do
+		IP=$(ifconfig $i | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+		if [ "$IP" != "" ]; then
+			echo $IP | nc $AUTOBUILD_IP 48723
+			break
+		fi
+	done
 fi
+
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
 allow-hotplug eth0
 iface eth0 inet manual
 EOF
+for i in eth1 eth2; do
+cat <<EOF > /writable/system-data/etc/network/interfaces.d/$i
+allow-hotplug $i
+iface $i inet dhcp
+EOF
+done
+
 dhclient -r eth0
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
