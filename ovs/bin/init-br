@@ -38,8 +38,13 @@ for i in eth1 eth2; do
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/$i
 allow-hotplug $i
 iface $i inet dhcp
+post-up route del default dev $i
 EOF
 done
+cat <<EOF > /writable/system-data/etc/network/interfaces.d/wan
+allow-hotplug wan
+iface wan inet dhcp
+EOF
 
 dhclient -r eth0
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
