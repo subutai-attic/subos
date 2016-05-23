@@ -34,10 +34,11 @@ cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
 allow-hotplug eth0
 iface eth0 inet manual
 EOF
-for i in eth1 eth2; do
+for i in wan eth2 eth1; do
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/$i
 allow-hotplug $i
 iface $i inet dhcp
+post-up route del default dev $i
 EOF
 done
 
@@ -54,4 +55,26 @@ iptables -t nat -A POSTROUTING -j MASQUERADE
 iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-fill
 
 ifup -a --allow=env
-dhclient mng-net
+dhclient -nw mng-net
+
+while true; do
+	for i in eth2 wan; do
+		if [ "$(cat /sys/class/net/$i/carrier 2> /dev/null)" != "1" ]; then
+			continue
+		fi
+
+		if [ "$(ifconfig $i | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "" ]; then
+			if [ "$(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')" != "$i" ]; then
+				ip route del 0/0
+				ip route add default via $(sed -n "/interface \"$i\";/,/}/p" /var/lib/dhcp/dhclient.leases |
+								grep "option routers" | tail -n1 | tr ';' ' ' | awk '{print $3}')
+				echo "Updating default route for $i"
+			fi
+			break
+		else
+			ip route del default dev $i
+			echo "Deleting default route for $i"
+		fi
+	done
+	sleep 10
+done
