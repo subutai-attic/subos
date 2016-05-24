@@ -42,19 +42,19 @@ ifup -a --allow=env
 dhclient -nw mng-net
 
 while true; do
-	timeout 10 dhclient eth0
+	timeout 10 dhclient -d eth0
 	if [ "$?" == "0" ]; then
 		ifconfig eth0 0
 		ovs-vsctl add-port wan eth0
 		ovs-vsctl del-port wan eth1
-		timeout 10 dhclient eth1
+		timeout 10 dhclient -d eth1
 	else
 		ifconfig eth1 0
 		ovs-vsctl add-port wan eth1
 		ovs-vsctl del-port wan eth0
-		timeout 10 dhclient eth0
+		timeout 10 dhclient -d eth0
 	fi
-	timeout 10 dhclient wan
+	timeout 10 dhclient -d wan
 
 	if [ "$AUTOBUILD_IP" != "" ]; then
 		if [ "$(ovs-vsctl list-ports wan | grep -c eth0)" == "1" ]; then
