@@ -20,15 +20,6 @@ ovs-vsctl --may-exist add-port wan eth0
 ifconfig eth0 0 && dhclient wan
 for i in {1..2}; do ifconfig eth$i up && timeout 10 dhclient eth$i; done
 
-if [ "$AUTOBUILD_IP" != "" ]; then
-	for i in eth2 eth1 wan; do
-		IP=$(ifconfig $i | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
-		if [ "$IP" != "" ]; then
-			echo $IP | nc $AUTOBUILD_IP 48723
-			break
-		fi
-	done
-fi
 
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
 allow-hotplug eth0
@@ -52,31 +43,22 @@ dhclient -nw mng-net
 
 while true; do
 	timeout 10 dhclient eth2
+
 	if [ "$?" == "0" ]; then
-		ovs-vsctl add-port wan eth2 && ovs-vsctl del-port wan eth0 && dhclient -r wan && dhclient wan
+		ovs-vsctl add-port wan eth2 && ovs-vsctl del-port wan eth0 && dhclient -r wan
 	else
-		ovs-vsctl add-port wan eth0 && ovs-vsctl del-port wan eth2 && dhclient -r wan && dhclient wan
+		ovs-vsctl add-port wan eth0 && ovs-vsctl del-port wan eth2 && dhclient -r wan
 	fi
+
 	dhclient -r eth2
+	timeout 30 dhclient wan
 
-
-#	for i in eth2 wan; do
-#		if [ "$(cat /sys/class/net/$i/carrier 2> /dev/null)" != "1" ]; then
-#			continue
-#		fi
-#
-#		if [ "$(ifconfig $i | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "" ]; then
-#			if [ "$(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')" != "$i" ]; then
-#				ip route del 0/0
-#				ip route add default via $(sed -n "/interface \"$i\";/,/}/p" /var/lib/dhcp/dhclient.leases |
-#								grep "option routers" | tail -n1 | tr ';' ' ' | awk '{print $3}')
-#				echo "Updating default route for $i"
-#			fi
-#			break
-#		else
-#			ip route del default dev $i
-#			echo "Deleting default route for $i"
-#		fi
-#	done
+	if [ "$AUTOBUILD_IP" != "" ]; then
+		IP=$(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
+		if [ "$IP" != "" ]; then
+			echo $IP | nc $AUTOBUILD_IP 48723
+			AUTOBUILD_IP=""
+		fi
+	fi
 	sleep 10
 done
