@@ -44,12 +44,12 @@ dhclient -nw mng-net
 while true; do
 	timeout 10 dhclient eth0
 	if [ "$?" == "0" ]; then
-		dhclient -r eth0
+		ifconfig eth0 0
 		ovs-vsctl add-port wan eth0
 		ovs-vsctl del-port wan eth1
 		timeout 10 dhclient eth1
 	else
-		dhclient -r eth1
+		ifconfig eth1 0
 		ovs-vsctl add-port wan eth1
 		ovs-vsctl del-port wan eth0
 		timeout 10 dhclient eth0
