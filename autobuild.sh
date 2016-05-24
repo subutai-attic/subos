@@ -109,11 +109,11 @@ function prepare_nic {
 	vboxmanage dhcpserver modify --ifname vboxnet0 --enable
 
 	vboxmanage modifyvm $CLONE --nic4 none
-	vboxmanage modifyvm $CLONE --nic3 bridged
-	vboxmanage modifyvm $CLONE --bridgeadapter3 $(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')
-	vboxmanage modifyvm $CLONE --nic2 hostonly
-	vboxmanage modifyvm $CLONE --hostonlyadapter2 vboxnet0
-	vboxmanage modifyvm $CLONE --nic1 nat
+	vboxmanage modifyvm $CLONE --nic3 hostonly
+	vboxmanage modifyvm $CLONE --hostonlyadapter3 vboxnet0
+	vboxmanage modifyvm $CLONE --nic2 nat
+	vboxmanage modifyvm $CLONE --nic1 bridged
+	vboxmanage modifyvm $CLONE --bridgeadapter1 $(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')
 }
 
 function export_ova {

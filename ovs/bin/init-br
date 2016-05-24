@@ -17,30 +17,14 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 done
 ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
 ovs-vsctl --may-exist add-port wan eth0
-ifconfig eth0 0 && dhclient wan
+ifconfig eth0 0 && dhclient -nw wan
 for i in {1..2}; do ifconfig eth$i up && timeout 10 dhclient eth$i; done
 
-if [ "$AUTOBUILD_IP" != "" ]; then
-	for i in eth2 eth1 wan; do
-		IP=$(ifconfig $i | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
-		if [ "$IP" != "" ]; then
-			echo $IP | nc $AUTOBUILD_IP 48723
-			break
-		fi
-	done
-fi
 
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
 allow-hotplug eth0
 iface eth0 inet manual
 EOF
-for i in wan eth2 eth1; do
-cat <<EOF > /writable/system-data/etc/network/interfaces.d/$i
-allow-hotplug $i
-iface $i inet dhcp
-post-up route del default dev $i
-EOF
-done
 
 dhclient -r eth0
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
@@ -58,23 +42,28 @@ ifup -a --allow=env
 dhclient -nw mng-net
 
 while true; do
-	for i in eth2 wan; do
-		if [ "$(cat /sys/class/net/$i/carrier 2> /dev/null)" != "1" ]; then
-			continue
-		fi
+	timeout 10 dhclient eth0
+	if [ "$?" == "0" ]; then
+		ifconfig eth0 0
+		ovs-vsctl add-port wan eth0
+		ovs-vsctl del-port wan eth1
+		timeout 10 dhclient eth1
+	else
+		ifconfig eth1 0
+		ovs-vsctl add-port wan eth1
+		ovs-vsctl del-port wan eth0
+		timeout 10 dhclient eth0
+	fi
+	timeout 10 dhclient wan
 
-		if [ "$(ifconfig $i | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "" ]; then
-			if [ "$(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')" != "$i" ]; then
-				ip route del 0/0
-				ip route add default via $(sed -n "/interface \"$i\";/,/}/p" /var/lib/dhcp/dhclient.leases |
-								grep "option routers" | tail -n1 | tr ';' ' ' | awk '{print $3}')
-				echo "Updating default route for $i"
-			fi
-			break
+	if [ "$AUTOBUILD_IP" != "" ]; then
+		if [ "$(ovs-vsctl list-ports wan | grep -c eth0)" == "1" ]; then
+			IP=$(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
 		else
-			ip route del default dev $i
-			echo "Deleting default route for $i"
+			IP=$(ifconfig eth2 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
 		fi
-	done
+		echo $IP | nc $AUTOBUILD_IP 48723
+		AUTOBUILD_IP=""
+	fi
 	sleep 10
 done
