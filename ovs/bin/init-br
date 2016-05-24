@@ -15,7 +15,7 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	sleep 1
 	ovs-vsctl --may-exist add-br wan
 done
-ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth2 | grep ether | awk '{print $2}')
+ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
 ovs-vsctl --may-exist add-port wan eth0
 ifconfig eth0 0 && dhclient wan
 for i in {1..2}; do ifconfig eth$i up && timeout 10 dhclient eth$i; done
@@ -42,17 +42,17 @@ ifup -a --allow=env
 dhclient -nw mng-net
 
 while true; do
-	timeout 10 dhclient eth2
+	timeout 10 dhclient eth0
 	if [ "$?" == "0" ]; then
-		dhclient -r eth2
-		ovs-vsctl add-port wan eth2
-		ovs-vsctl del-port wan eth0
-		timeout 10 dhclient eth0
-	else
 		dhclient -r eth0
 		ovs-vsctl add-port wan eth0
-		ovs-vsctl del-port wan eth2
-		timeout 10 dhclient eth2
+		ovs-vsctl del-port wan eth1
+		timeout 10 dhclient eth1
+	else
+		dhclient -r eth1
+		ovs-vsctl add-port wan eth1
+		ovs-vsctl del-port wan eth0
+		timeout 10 dhclient eth0
 	fi
 	timeout 10 dhclient wan
 
