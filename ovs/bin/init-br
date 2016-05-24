@@ -53,16 +53,9 @@ dhclient -nw mng-net
 while true; do
 	timeout 10 dhclient eth2
 	if [ "$?" == "0" ]; then
-		dhclient -r eth2
-		ovs-vsctl add-port wan eth2
-		ovs-vsctl del-port wan eth0
-		dhclient -r wan
-		dhclient wan
+		ovs-vsctl add-port wan eth2 && ovs-vsctl del-port wan eth0 && dhclient -r wan && dhclient wan
 	else
-		ovs-vsctl del-port wan eth2
-		ovs-vsctl add-port wan eth0
-		dhclient -r wan
-		dhclient wan
+		ovs-vsctl add-port wan eth0 && ovs-vsctl del-port wan eth2 && dhclient -r wan && dhclient wan
 	fi
 	dhclient -r eth2
 
