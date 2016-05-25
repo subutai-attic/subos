@@ -48,11 +48,13 @@ while true; do
 		ovs-vsctl add-port wan eth0
 		ovs-vsctl del-port wan eth1
 		timeout 10 dhclient eth1
+		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
 	else
 		ifconfig eth1 0
 		ovs-vsctl add-port wan eth1
 		ovs-vsctl del-port wan eth0
 		timeout 10 dhclient eth0
+		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | awk '{print $2}')
 	fi
 	timeout 10 dhclient wan
 
