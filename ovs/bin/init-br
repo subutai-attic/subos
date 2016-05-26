@@ -17,8 +17,8 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 done
 ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
 ovs-vsctl --may-exist add-port wan eth0
-ifconfig eth0 0 && dhclient -nw wan
-for i in {1..2}; do ifconfig eth$i up && timeout 10 dhclient eth$i; done
+ifconfig eth0 0 && dhclient -ne wan
+ifconfig eth2 up && timeout 10 dhclient eth2
 
 
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
@@ -48,16 +48,17 @@ while true; do
 		ifconfig eth0 0
 		ovs-vsctl add-port wan eth0
 		ovs-vsctl del-port wan eth1
+		timeout 10 dhclient wan
 		timeout 10 dhclient eth1
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
 	else
 		ifconfig eth1 0
 		ovs-vsctl add-port wan eth1
 		ovs-vsctl del-port wan eth0
+		timeout 10 dhclient wan
 		timeout 10 dhclient eth0
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | awk '{print $2}')
 	fi
-	timeout 10 dhclient wan
 
 	if [ "$AUTOBUILD_IP" != "" ]; then
 		if [ "$(ovs-vsctl list-ports wan | grep -c eth0)" == "1" ]; then
