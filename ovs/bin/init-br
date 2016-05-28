@@ -17,7 +17,7 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 done
 ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
 ovs-vsctl --may-exist add-port wan eth0
-ifconfig eth0 0 && dhclient -ne wan
+ifconfig eth0 0 && dhclient -nw wan
 ifconfig eth2 up && timeout 10 dhclient eth2
 
 
@@ -40,7 +40,6 @@ iptables -t nat -A POSTROUTING -j MASQUERADE
 iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-fill
 
 ifup -a --allow=env
-dhclient -nw mng-net
 
 while true; do
 	timeout 10 dhclient eth0
@@ -60,6 +59,8 @@ while true; do
 		timeout 10 dhclient eth0
 	fi
 
+	timeout 10 dhclient mng-net
+
 	if [ "$AUTOBUILD_IP" != "" ]; then
 		if [ "$(ovs-vsctl list-ports wan | grep -c eth0)" == "1" ]; then
 			IP=$(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
@@ -70,5 +71,5 @@ while true; do
 		AUTOBUILD_IP=""
 	fi
 	sleep 10
-	ps aux | egrep "dhclient eth|dhclient wan" | awk '{print $2}' | xargs kill
+	ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
 done
