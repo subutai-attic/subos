@@ -4,7 +4,7 @@
 
 MNG_VLAN="$(cat $SUBUTAI_DATA_PREFIX/vlan)"
 if [ "$MNG_VLAN" == "" ]; then
-        MNG_VLAN=5
+        MNG_VLAN=2
 	echo "$MNG_VLAN" > $SUBUTAI_DATA_PREFIX/vlan
 fi
 
