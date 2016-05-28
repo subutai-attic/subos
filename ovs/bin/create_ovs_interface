@@ -6,7 +6,7 @@
 # creating default ovs bridge and ports durin lxc startup
 MNG_VLAN="$(cat /var/lib$SUBUTAI_APP_PREFIX/vlan)"
 if [ "$MNG_VLAN" == "" ]; then
-        MNG_VLAN=4
+        MNG_VLAN=2
 	echo "$MNG_VLAN" > /var/lib$SUBUTAI_APP_PREFIX/vlan
 fi
 
