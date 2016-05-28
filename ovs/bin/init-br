@@ -21,8 +21,8 @@ allow-hotplug eth0
 iface eth0 inet manual
 EOF
 
-ifconfig eth1 up && dhclient -nw eth1
-ifconfig eth2 up && dhclient -nw eth2
+dhclient -nw eth1
+dhclient -nw eth2
 
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
@@ -43,18 +43,21 @@ while true; do
 		ovs-vsctl --may-exist add-port wan eth0
 		ovs-vsctl --if-exists del-port wan eth1
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
+		ifconfig eth0 0
 	else
 		ovs-vsctl --may-exist add-port wan eth1
 		ovs-vsctl --if-exists del-port wan eth0
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | awk '{print $2}')
+		ifconfig eth1 0
 	fi
 
-	ifconfig eth0 0
-	ifconfig eth1 0
+	if [ "$(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')" != "wan" ]; then
+		ip route del 0/0
+	fi
 	timeout 10 dhclient wan
 
-	if [ "$(subutai list management | grep -c management)" != "1" ]; then
-		timeout 3 dhclient mng-net
+	if [ "$(ifconfig mng-net | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "10.10.10.254" ]; then
+		dhclient -nw mng-net
 	fi
 	
 	if [ "$AUTOBUILD_IP" != "" ]; then
