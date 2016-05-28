@@ -6,7 +6,7 @@
 # creating default ovs bridge and ports durin lxc startup
 MNG_VLAN="$(cat /var/lib$SUBUTAI_APP_PREFIX/vlan)"
 if [ "$MNG_VLAN" == "" ]; then
-        MNG_VLAN=2
+        MNG_VLAN=4
 	echo "$MNG_VLAN" > /var/lib$SUBUTAI_APP_PREFIX/vlan
 fi
 
@@ -16,13 +16,8 @@ gateway="$(grep 'lxc.network.ipv4.gateway' /mnt/lib/lxc/$1/config | awk '{print 
 if [ "$5" == "management" ]; then
 	ovs-vsctl --if-exists del-port wan $5
 	ovs-vsctl --may-exist add-port wan $5
-	ovs-vsctl --may-exist add-port wan mng-gw -- set interface mng-gw type=internal
 	ovs-vsctl set port $5 tag=$MNG_VLAN
-	ovs-vsctl set port mng-gw tag=$MNG_VLAN
-	while [ "$( ifconfig -s | grep -c mng-gw )" != "1" ]; do
-                ifconfig mng-gw 10.10.10.254/24
-                sleep 1
-        done
+        ifconfig mng-net 10.10.10.254/24
 
         for i in 5005 8443 8444; do
 		for j in wan eth1 eth2; do iptables -t nat -A PREROUTING -i $j -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i ; done
@@ -67,4 +62,3 @@ else
         ovs-vsctl --may-exist add-port lxc-br $5
 	echo -e "\n10.10.0.254  gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
 fi
-
