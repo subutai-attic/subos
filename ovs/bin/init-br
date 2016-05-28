@@ -15,19 +15,15 @@ while [ "`ip link | grep 'wan' | wc -l`" -eq "0" ]; do
 	sleep 1
 	ovs-vsctl --may-exist add-br wan
 done
-ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
-ovs-vsctl --may-exist add-port wan eth0
-ifconfig eth0 0 && dhclient -nw wan
-ifconfig eth2 up && timeout 10 dhclient eth2
-
 
 cat <<EOF > /writable/system-data/etc/network/interfaces.d/eth0
 allow-hotplug eth0
 iface eth0 inet manual
 EOF
 
-dhclient -x eth0
-ifconfig eth0 0
+ifconfig eth1 up && dhclient -nw eth1
+ifconfig eth2 up && dhclient -nw eth2
+
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
 ovs-vsctl set port mng-net tag=$MNG_VLAN
@@ -44,22 +40,23 @@ ifup -a --allow=env
 while true; do
 	timeout 10 dhclient eth0
 	if [ "$?" == "0" ]; then
-		ovs-vsctl add-port wan eth0
-		ovs-vsctl del-port wan eth1
+		ovs-vsctl --may-exist add-port wan eth0
+		ovs-vsctl --if-exists del-port wan eth1
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth0 | grep ether | awk '{print $2}')
-		timeout 10 dhclient wan
-		timeout 10 dhclient eth1
 	else
-		ifconfig eth1 0
-		ovs-vsctl add-port wan eth1
-		ovs-vsctl del-port wan eth0
+		ovs-vsctl --may-exist add-port wan eth1
+		ovs-vsctl --if-exists del-port wan eth0
 		ovs-vsctl set bridge wan other-config:hwaddr=$(ip link show eth1 | grep ether | awk '{print $2}')
-		timeout 10 dhclient wan
 	fi
 
 	ifconfig eth0 0
-	timeout 10 dhclient mng-net
+	ifconfig eth1 0
+	timeout 10 dhclient wan
 
+	if [ "$(subutai list management | grep -c management)" != "1" ]; then
+		timeout 3 dhclient mng-net
+	fi
+	
 	if [ "$AUTOBUILD_IP" != "" ]; then
 		if [ "$(ovs-vsctl list-ports wan | grep -c eth0)" == "1" ]; then
 			IP=$(ifconfig wan | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')
@@ -70,5 +67,5 @@ while true; do
 		AUTOBUILD_IP=""
 	fi
 	sleep 10
-	ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
+        ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
 done
