@@ -18,6 +18,7 @@ if [ "$5" == "management" ]; then
 	ovs-vsctl --may-exist add-port wan $5
 	ovs-vsctl set port $5 tag=$MNG_VLAN
 	ps aux | grep "dhclient mng-net" | awk '{print $2}' | xargs kill
+        dhclient -r mng-net
         ifconfig mng-net 10.10.10.254/24
 
         for i in 5005 8443 8444; do
