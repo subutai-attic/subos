@@ -21,9 +21,6 @@ allow-hotplug eth0
 iface eth0 inet manual
 EOF
 
-dhclient -nw eth1
-dhclient -nw eth2
-
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
 ovs-vsctl set port mng-net tag=$MNG_VLAN
@@ -55,6 +52,8 @@ while true; do
 		ip route del 0/0
 	fi
 	timeout 10 dhclient wan
+	timeout 10 dhclient eth2
+	timeout 10 dhclient eth1
 
 	if [ "$AUTOBUILD_IP" != "" ]; then
 		if [ "$(ovs-vsctl list-ports wan | grep -c eth0)" == "1" ]; then
@@ -71,5 +70,5 @@ while true; do
 	fi
 
 	sleep 10
-        ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
+	ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
 done
