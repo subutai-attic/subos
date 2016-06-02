@@ -22,7 +22,6 @@ iface eth0 inet manual
 EOF
 
 dhclient -nw eth1
-dhclient -nw eth2
 
 ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
 ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
@@ -38,6 +37,7 @@ iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-f
 ifup -a --allow=env
 
 while true; do
+	timeout 10 dhclient eth2
 	timeout 10 dhclient eth0
 	if [ "$?" == "0" ]; then
 		ovs-vsctl --may-exist add-port wan eth0
