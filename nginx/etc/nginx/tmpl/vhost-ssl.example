@@ -18,6 +18,8 @@ server {
     ssl_certificate /var/lib/apps/subutai/current/web/ssl/UNIXDATE.crt;
     ssl_certificate_key /var/lib/apps/subutai/current/web/ssl/UNIXDATE.key;
 
+    error_page 497	https://$host$request_uri;
+
     location / {
 	proxy_pass http://DOMAIN-upstream/;
 	proxy_set_header   X-Real-IP $remote_addr;
