@@ -1,6 +1,7 @@
 #!/bin/bash
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
+mkdir -p /mnt/lib/lxc/tmpdir/var/cache/nginx/
 mkdir -p $SUBUTAI_DATA_PREFIX/var/cache/nginx/
 mkdir -p $SUBUTAI_DATA_PREFIX/var/log/nginx/
 mkdir -p $SUBUTAI_DATA_PREFIX/var/run/
