@@ -39,7 +39,7 @@ iface gw-$vlan inet static
   address $gateway
   netmask 255.255.255.0
 EOF
-        ifconfig gw-$vlan $gateway
+        ifconfig gw-$vlan $gateway/24
 	echo -e "\n$gateway	gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
 
 	ipaddr=$(grep "lxc.network.ipv4 " /mnt/lib/lxc/$1/config | awk -F'[ /]' '{print $3}')
