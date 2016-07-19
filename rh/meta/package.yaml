@@ -61,11 +61,11 @@ services:
    description: "lxcfs service"
    start: bin/lxcfs-wrapper
 binaries:
- - exec: bin/update-subutai
-   name: update-subutai
-   security-template: unconfined
  - exec: bin/subutai
    name: subutai
+   security-template: unconfined
+ - exec: bin/p2p
+   name: p2p.bin
    security-template: unconfined
  - exec: bin/lxc-attach
    name: lxc-attach
