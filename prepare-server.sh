@@ -6,7 +6,7 @@ bash -c "echo 180 > /sys/block/sdb/device/timeout"
 if [ "$(grep "gw.intra.lan" -c /etc/writable/hostname)" == "0" ]; then
         hostnamectl set-hostname "rh`date +%s`.gw.intra.lan" 
 fi
-snappy install --allow-unauthenticated /home/ubuntu/tmpfs/subutai_4.0.1-*_amd64.snap
+snappy install --allow-unauthenticated /home/ubuntu/tmpfs/subutai_4.*_amd64.snap
 if [ -e "/dev/sdc" ]; then 
 	disk="/dev/sdc";
 else 
