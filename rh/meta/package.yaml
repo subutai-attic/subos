@@ -1,5 +1,5 @@
 name: subutai
-version: 4.0.1-TIMESTAMP
+version: 4.0.2-TIMESTAMP
 architecture: amd64
 vendor: SSF <info@subutai.io>
 type: framework
