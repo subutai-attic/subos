@@ -43,10 +43,6 @@ services:
    caps: []
    description: "Openvswitch vswitch service"
    start: bin/ovs-init-switch
- - name: collectd
-   security-template: unconfined
-   description: "Collectd service"
-   start: bin/collectd-wrapper -f -C etc/collectd.conf
  - name: cgmanager 
    security-template: unconfined
    description: "CGManager service"
