@@ -77,7 +77,7 @@ function clone_vm {
 function install_snap {
 	if [ -f "$HOME/.ssh/id_rsa.pub" ]; then
 		echo "Adding user public key"
-		pubkey="$(cat $HOME/.ssh/id_rsa.pub)"
+		pubkey="$(head -1 $HOME/.ssh/id_rsa.pub)"
 		sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sudo bash -c 'echo $pubkey >> /root/.ssh/authorized_keys'"
 	fi
 	echo "Creating tmpfs"
