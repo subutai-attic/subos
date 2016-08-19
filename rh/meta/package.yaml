@@ -25,9 +25,7 @@ services:
    description: "p2p service"
    start: bin/p2p daemon -save /var/lib/apps/subutai/current/p2p.save 
  - name: subutai-agent
-   security-policy:
-      apparmor: meta/subutai-agent.profile
-      seccomp: meta/subutai-agent.seccomp
+   security-template: unconfined
    description: "Subutai-agent service"
    start: bin/agent-wrapper
    stop: bin/agent-wrapper stop
