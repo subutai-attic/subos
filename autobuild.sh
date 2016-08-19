@@ -222,7 +222,7 @@ if [ "$VM" == "true" -o "$EXPORT" != "false" ]; then
 	if [ "$VM" == "true" ]; then
 		vboxmanage startvm --type headless $CLONE
 		echo "Waiting for Subutai IP address"
-		echo -e "Please use following command to access your new Subutai:\\n ssh root@`nc -l 48723`"
+		echo -e "Please use following command to access your new Subutai:\\nssh root@`nc -l 48723`"
 	else
 		vboxmanage unregistervm --delete $CLONE
 	fi
