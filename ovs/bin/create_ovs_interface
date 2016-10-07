@@ -21,10 +21,9 @@ if [ "$5" == "management" ]; then
         dhclient -r mng-net
         ifconfig mng-net 10.10.10.254/24
 
-        for i in 5005 8443 8444; do
+        for i in 8443 8444; do
 		for j in wan eth1 eth2; do iptables -t nat -A PREROUTING -i $j -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i ; done
         done
-	for j in wan eth1 eth2; do iptables -t nat -A PREROUTING -i $j -p tcp -m tcp --dport 2222 -j DNAT --to-destination 10.10.10.1:22 ; done
 
         exit 0
 elif [ "$vlan" ]; then
