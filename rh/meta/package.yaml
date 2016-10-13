@@ -4,6 +4,10 @@ architecture: amd64
 vendor: SSF <info@subutai.io>
 type: framework
 services:
+ - name: filebeat
+   security-template: unconfined
+   description: "filebeat service"
+   start: bin/filebeat -c /apps/subutai/current/etc/filebeat.yml
  - name: nginx 
    security-template: unconfined
    description: "nginx service"
