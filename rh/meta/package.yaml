@@ -4,6 +4,10 @@ architecture: amd64
 vendor: SSF <info@subutai.io>
 type: framework
 services:
+ - name: fail2ban
+   security-template: unconfined
+   description: "fail2ban service"
+   start: fail2ban/fail2ban-wrapper 
  - name: filebeat
    security-template: unconfined
    description: "filebeat service"
@@ -83,4 +87,3 @@ binaries:
       apparmor: meta/ovs-db.profile
       seccomp: meta/ovs-db.seccomp
    caps: []
-

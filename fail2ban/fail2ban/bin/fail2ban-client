@@ -1,0 +1,4 @@
+#!/apps/subutai/current/fail2ban/bin/python
+# EASY-INSTALL-SCRIPT: 'fail2ban==0.9.4','fail2ban-client'
+__requires__ = 'fail2ban==0.9.4'
+__import__('pkg_resources').run_script('fail2ban==0.9.4', 'fail2ban-client')
