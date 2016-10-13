@@ -139,7 +139,7 @@ function export_box {
 }
 
 function setup_var {
-        LIST="btrfs curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq nginx lxcfs filebeat"
+        LIST="btrfs curl lxc ovs rh rngd subutai cgmanager p2p dnsmasq nginx lxcfs filebeat fail2ban"
        	CLONE=subutai-"$DATE"
 }
 
