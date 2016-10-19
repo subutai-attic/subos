@@ -87,7 +87,7 @@ function install_snap {
 		snap_build
 	fi
 	sshpass -p "ubuntu" scp -P5567 prepare-server.sh /tmp/subutai_4.*-${DATE}_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
-	AUTOBUILD_IP=$(/sbin/ifconfig `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}') 
+	AUTOBUILD_IP=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep -Po 'inet \K[\d.]+')
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sed -i \"s/IPPLACEHOLDER/$AUTOBUILD_IP/g\" /home/ubuntu/tmpfs/prepare-server.sh"
 	echo "Running install script"
 	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sudo /home/ubuntu/tmpfs/prepare-server.sh"
