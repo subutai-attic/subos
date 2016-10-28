@@ -1,0 +1,7 @@
+#!/bin/bash
+#Include enviroment variables
+. ${SNAP_APP_PATH}/fail2ban/bin/activate
+
+${SNAP_APP_PATH}/fail2ban/bin/fail2ban-client -c /apps/subutai/current/etc/fail2ban/ -i -x start
+sleep infinity
+
