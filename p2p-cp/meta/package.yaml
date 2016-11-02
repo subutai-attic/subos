@@ -7,4 +7,4 @@ services:
  - name: p2p-cp 
    security-template: unconfined
    description: "p2p-cp service"
-   start: bin/cp -t dht1.subut.ai:6881
+   start: bin/cp -t dht1.subut.ai:6881 -listen 40622 
