@@ -15,4 +15,4 @@ while [ "$(ls $SUBUTAI_DATA_PREFIX/var/lib/lxcfs/ | wc -l)" == "0" ]; do
 	sleep 1
 done
 
-/apps/subutai/current/bin/subutai daemon
+exec /apps/subutai/current/bin/subutai daemon
