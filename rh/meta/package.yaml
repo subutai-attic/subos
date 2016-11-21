@@ -36,7 +36,6 @@ services:
    security-template: unconfined
    description: "Subutai-agent service"
    start: bin/agent-wrapper
-   stop: bin/agent-wrapper stop
  - name: ovs-init-db
    security-policy:
       apparmor: meta/ovs-db.profile
