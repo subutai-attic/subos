@@ -32,9 +32,7 @@ try {
 			returnStdout: true)
 
 		/* change export path to current directory */
-		sh """
-			sed -i 's/\.\.\/export/\.\//' autobuild.sh
-		"""
+		sh 'sed -i "s/\.\.\/export/\.\//" autobuild.sh'
 
 		/* build snap */
 		String buildOutput = sh (script: """
