@@ -55,7 +55,7 @@ try {
 		stash includes: 'subutai_*.snap', name: 'snap'
 
 	}
-	node(){
+	node() {
 		/* Running Integration tests only on dev branch */
 		deleteDir()
 		if (env.BRANCH_NAME == 'jenkinsfile') {
@@ -120,7 +120,7 @@ try {
 			"""
 		}
 	}
-	node(){
+	node() {
 		deleteDir()
 		stage("Upload built snap to kurjun")
 		notifyBuildDetails = "\nFailed on Stage - Upload built snap to kurjun"
