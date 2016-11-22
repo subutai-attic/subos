@@ -32,7 +32,9 @@ try {
 			returnStdout: true)
 
 		/* change export path to current directory */
-		sh 'sed -i "s/\.\.\/export/\.\//" autobuild.sh'
+		sh """
+			sed 's/EXPORT_DIR=.*/EXPORT_DIR=./g' -i subutai/etc/agent.gcfg
+		"""
 
 		/* build snap */
 		String buildOutput = sh (script: """
