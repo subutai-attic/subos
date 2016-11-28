@@ -3,7 +3,7 @@
 notifyBuildDetails = ""
 subosCommitId = ""
 serenityReportDir = ""
-mvnHome = tool 'M3'
+// mvnHome = tool 'M3'
 snapBuildTime = ""
 agentVersion = ""
 
