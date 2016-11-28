@@ -10,48 +10,48 @@ agentVersion = ""
 try {
 	notifyBuild('STARTED')
 	node() {
-		// /* Building snap */
-		// deleteDir()
+		/* Building snap */
+		deleteDir()
 
-		// stage("Checkout source")
-		// /* checkout agent repo */
-		// notifyBuildDetails = "\nFailed on Stage - Checkout source"
+		stage("Checkout source")
+		/* checkout agent repo */
+		notifyBuildDetails = "\nFailed on Stage - Checkout source"
 
-		// checkout scm
+		checkout scm
 
-		// subosCommitId = sh (script: "git rev-parse HEAD", returnStdout: true)
-		// serenityReportDir = "/var/lib/jenkins/www/serenity/${subosCommitId}"
+		subosCommitId = sh (script: "git rev-parse HEAD", returnStdout: true)
+		serenityReportDir = "/var/lib/jenkins/www/serenity/${subosCommitId}"
 
-		// stage("Build snap package")
-		// /* Build snap package based on autobuild.sh script */
-		// notifyBuildDetails = "\nFailed on Stage - Build snap package"
+		stage("Build snap package")
+		/* Build snap package based on autobuild.sh script */
+		notifyBuildDetails = "\nFailed on Stage - Build snap package"
 
-		// /* get agent version */
-		// agentVersion = sh (script: "cat subutai/etc/agent.gcfg | grep version | cut -d ' ' -f3", 
-		// 	returnStdout: true)
+		/* get agent version */
+		agentVersion = sh (script: "cat subutai/etc/agent.gcfg | grep version | cut -d ' ' -f3", 
+			returnStdout: true)
 
-		// /* change export path to current directory */
-		// sh """
-		// 	sed 's/EXPORT_DIR=.*/EXPORT_DIR=./g' -i subutai/etc/agent.gcfg
-		// """
+		/* change export path to current directory */
+		sh """
+			sed 's/EXPORT_DIR=.*/EXPORT_DIR=./g' -i subutai/etc/agent.gcfg
+		"""
 
-		// /* build snap */
-		// String buildOutput = sh (script: """
-		// 	./autobuild.sh -b
-		// 	""", returnStdout: true)
+		/* build snap */
+		String buildOutput = sh (script: """
+			./autobuild.sh -b
+			""", returnStdout: true)
 
-		// snapBuildTime = sh (script: """
-		// 	echo ${buildOutput} | cut -d '-' -f2 | cut -d '_' -f1
-		// 	""", returnStdout: true)
+		snapBuildTime = sh (script: """
+			echo ${buildOutput} | cut -d '-' -f2 | cut -d '_' -f1
+			""", returnStdout: true)
 
 
-		// /* rename built snap */
-		// sh """
-		// 	mv (echo $out | cut -d \' -f 2) subutai_${agentVersion}_amd64-${env.BRANCH_NAME}.snap
-		// """
+		/* rename built snap */
+		sh """
+			mv (echo $out | cut -d \' -f 2) subutai_${agentVersion}_amd64-${env.BRANCH_NAME}.snap
+		"""
 
-		// /* stash snap to use it in next node() */
-		// stash includes: 'subutai_*.snap', name: 'snap'
+		/* stash snap to use it in next node() */
+		stash includes: 'subutai_*.snap', name: 'snap'
 
 	}
 	// node() {
