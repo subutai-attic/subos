@@ -10,48 +10,48 @@ agentVersion = ""
 try {
 	notifyBuild('STARTED')
 	node() {
-		/* Building snap */
-		deleteDir()
+		// /* Building snap */
+		// deleteDir()
 
-		stage("Checkout source")
-		/* checkout agent repo */
-		notifyBuildDetails = "\nFailed on Stage - Checkout source"
+		// stage("Checkout source")
+		// /* checkout agent repo */
+		// notifyBuildDetails = "\nFailed on Stage - Checkout source"
 
-		checkout scm
+		// checkout scm
 
-		subosCommitId = sh (script: "git rev-parse HEAD", returnStdout: true)
-		serenityReportDir = "/var/lib/jenkins/www/serenity/${subosCommitId}"
+		// subosCommitId = sh (script: "git rev-parse HEAD", returnStdout: true)
+		// serenityReportDir = "/var/lib/jenkins/www/serenity/${subosCommitId}"
 
-		stage("Build snap package")
-		/* Build snap package based on autobuild.sh script */
-		notifyBuildDetails = "\nFailed on Stage - Build snap package"
+		// stage("Build snap package")
+		// /* Build snap package based on autobuild.sh script */
+		// notifyBuildDetails = "\nFailed on Stage - Build snap package"
 
-		/* get agent version */
-		agentVersion = sh (script: "cat subutai/etc/agent.gcfg | grep version | cut -d ' ' -f3", 
-			returnStdout: true)
+		// /* get agent version */
+		// agentVersion = sh (script: "cat subutai/etc/agent.gcfg | grep version | cut -d ' ' -f3", 
+		// 	returnStdout: true)
 
-		/* change export path to current directory */
-		sh """
-			sed 's/EXPORT_DIR=.*/EXPORT_DIR=./g' -i subutai/etc/agent.gcfg
-		"""
+		// /* change export path to current directory */
+		// sh """
+		// 	sed 's/EXPORT_DIR=.*/EXPORT_DIR=./g' -i subutai/etc/agent.gcfg
+		// """
 
-		/* build snap */
-		String buildOutput = sh (script: """
-			./autobuild.sh -b
-			""", returnStdout: true)
+		// /* build snap */
+		// String buildOutput = sh (script: """
+		// 	./autobuild.sh -b
+		// 	""", returnStdout: true)
 
-		snapBuildTime = sh (script: """
-			echo ${buildOutput} | cut -d '-' -f2 | cut -d '_' -f1
-			""", returnStdout: true)
+		// snapBuildTime = sh (script: """
+		// 	echo ${buildOutput} | cut -d '-' -f2 | cut -d '_' -f1
+		// 	""", returnStdout: true)
 
 
-		/* rename built snap */
-		sh """
-			mv (echo $out | cut -d \' -f 2) subutai_${agentVersion}_amd64-${env.BRANCH_NAME}.snap
-		"""
+		// /* rename built snap */
+		// sh """
+		// 	mv (echo $out | cut -d \' -f 2) subutai_${agentVersion}_amd64-${env.BRANCH_NAME}.snap
+		// """
 
-		/* stash snap to use it in next node() */
-		stash includes: 'subutai_*.snap', name: 'snap'
+		// /* stash snap to use it in next node() */
+		// stash includes: 'subutai_*.snap', name: 'snap'
 
 	}
 	// node() {
@@ -166,38 +166,38 @@ try {
 	notifyBuild(currentBuild.result, notifyBuildDetails)
 }
 
-// https://jenkins.io/blog/2016/07/18/pipline-notifications/
-def notifyBuild(String buildStatus = 'STARTED', String details = '') {
-	// build status of null means successful
-	buildStatus = buildStatus ?: 'SUCCESSFUL'
+// // https://jenkins.io/blog/2016/07/18/pipline-notifications/
+// def notifyBuild(String buildStatus = 'STARTED', String details = '') {
+// 	// build status of null means successful
+// 	buildStatus = buildStatus ?: 'SUCCESSFUL'
 
-	// Default values
-	def colorName = 'RED'
-	def colorCode = '#FF0000'
-	def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"  	
-	def summary = "${subject} (${env.BUILD_URL})"
+// 	// Default values
+// 	def colorName = 'RED'
+// 	def colorCode = '#FF0000'
+// 	def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"  	
+// 	def summary = "${subject} (${env.BUILD_URL})"
 
-	// Override default values based on build status
-	if (buildStatus == 'STARTED') {
-		color = 'YELLOW'
-		colorCode = '#FFFF00'  
-	} else if (buildStatus == 'SUCCESSFUL') {
-		color = 'GREEN'
-		colorCode = '#00FF00'
-	} else {
-		color = 'RED'
-		colorCode = '#FF0000'
-		summary = "${subject} (${env.BUILD_URL})${details}"
-	}
-	// Get token
-	def slackToken = getSlackToken('sysnet-bots-slack-token')
-	// Send notifications
-	withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
-    	//slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
-	}
-}
+// 	// Override default values based on build status
+// 	if (buildStatus == 'STARTED') {
+// 		color = 'YELLOW'
+// 		colorCode = '#FFFF00'  
+// 	} else if (buildStatus == 'SUCCESSFUL') {
+// 		color = 'GREEN'
+// 		colorCode = '#00FF00'
+// 	} else {
+// 		color = 'RED'
+// 		colorCode = '#FF0000'
+// 		summary = "${subject} (${env.BUILD_URL})${details}"
+// 	}
+// 	// Get token
+// 	def slackToken = getSlackToken('sysnet-bots-slack-token')
+// 	// Send notifications
+// 	withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
+//     	//slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
+// 	}
+// }
 
-@NonCPS
-def jsonParse(def json) {
-    new groovy.json.JsonSlurperClassic().parseText(json)
-}
+// @NonCPS
+// def jsonParse(def json) {
+//     new groovy.json.JsonSlurperClassic().parseText(json)
+// }
