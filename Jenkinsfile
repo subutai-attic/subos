@@ -7,9 +7,7 @@ snapBuildTime = ""
 agentVersion = ""
 
 try {
-	// withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
-	// 	notifyBuild('STARTED', notifyBuildDetails, slackToken)
-	// }
+	notifyBuild('STARTED', notifyBuildDetails, slackToken)
 
 	node() {
 		/* Building snap */
@@ -61,7 +59,7 @@ try {
 	node() {
 		/* Running Integration tests only on dev branch */
 		deleteDir()
-		if (env.BRANCH_NAME == 'jenkinsfile') {
+		if (env.BRANCH_NAME == 'dev') {
 			lock('test-node') {
 				mvnHome = tool 'M3'
 
@@ -174,9 +172,7 @@ try {
 	throw e
 } finally {
 	// Success or failure, always send notifications
-	// withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
-	// 	notifyBuild(currentBuild.result, notifyBuildDetails, slackToken)
-	// }
+	notifyBuild(currentBuild.result, notifyBuildDetails, slackToken)
 }
 
 // https://jenkins.io/blog/2016/07/18/pipline-notifications/
@@ -202,10 +198,24 @@ def notifyBuild(String buildStatus = 'STARTED', String details = '', String toke
 		colorCode = '#FF0000'
 		summary = "${subject} (${env.BUILD_URL})${details}"
 	}
-	// Get token
-	// def slackToken = getSlackToken('sysnet-bots-slack-token')
-	// Send notifications
-	// withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
-	slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
-	// }
+  // Get token
+  def slackToken = getSlackToken('ss-bots-slack-token')
+  // Send notifications
+  slackSend (color: colorCode, message: summary, teamDomain: 'subutai-io', token: "${slackToken}")
+}
+
+// get slack token from global jenkins credentials store
+@NonCPS
+def getSlackToken(String slackCredentialsId){
+	// id is ID of creadentials
+	def jenkins_creds = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
+
+	String found_slack_token = jenkins_creds.getStore().getDomains().findResult { domain ->
+	  jenkins_creds.getCredentials(domain).findResult { credential ->
+	    if(slackCredentialsId.equals(credential.id)) {
+	      credential.getSecret()
+	    }
+	  }
+	}
+	return found_slack_token
 }
