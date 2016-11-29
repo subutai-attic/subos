@@ -30,7 +30,7 @@ try {
 
 		/* get agent version */
 		agentVersion = sh (script: "cat subutai/etc/agent.gcfg | grep version | cut -d ' ' -f3",
-			returnStdout: true)
+			returnStdout: true).trim()
 
 		/* change export path to current directory */
 		sh """
