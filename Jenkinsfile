@@ -7,9 +7,9 @@ snapBuildTime = ""
 agentVersion = ""
 
 try {
-	withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
-		notifyBuild('STARTED', notifyBuildDetails, slackToken)
-	}
+	// withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
+	// 	notifyBuild('STARTED', notifyBuildDetails, slackToken)
+	// }
 
 	node() {
 		/* Building snap */
@@ -169,9 +169,9 @@ try {
 	throw e
 } finally {
 	// Success or failure, always send notifications
-	withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
-		notifyBuild(currentBuild.result, notifyBuildDetails, slackToken)
-	}
+	// withCredentials([string(credentialsId: 'sysnet-bots-slack-token', variable: 'slackToken')]) {
+	// 	notifyBuild(currentBuild.result, notifyBuildDetails, slackToken)
+	// }
 }
 
 // https://jenkins.io/blog/2016/07/18/pipline-notifications/
