@@ -44,7 +44,7 @@ try {
 
 		snapFileName = sh (script: """
 			ls snap/
-			""", returnStdout: true)
+			""", returnStdout: true).trim()
 		snapBuildTime = sh (script: """
 			echo ${snapFileName} | cut -d '-' -f2 | cut -d '_' -f1
 			""")
