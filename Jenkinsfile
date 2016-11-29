@@ -98,6 +98,12 @@ try {
 					echo y | subutai import management
 				EOF"""
 
+				stage("Integration tests")
+				/* Running test, copy tests result to www directory */
+				notifyBuildDetails = "\nFailed on Stage - Integration tests\nSerenity Tests Results:\n${env.JENKINS_URL}serenity/${subosCommitId}"
+
+				git url: "https://github.com/subutai-io/playbooks.git"
+
 				/* wait until SS starts */
 				timeout(time: 5, unit: 'MINUTES') {
 					sh """
@@ -109,9 +115,6 @@ try {
 					"""
 				}
 
-				stage("Integration tests")
-				/* Running test, copy tests result to www directory */
-				notifyBuildDetails = "\nFailed on Stage - Integration tests\nSerenity Tests Results:\n${env.JENKINS_URL}serenity/${subosCommitId}"
 				sh """
 					set +e
 					./run_tests_qa.sh -m ${env.SS_TEST_NODE}
