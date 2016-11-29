@@ -40,7 +40,7 @@ try {
 		/* build snap */
 		String buildOutput = sh (script: """
 			./autobuild.sh -b
-			""", returnStdout: true)
+			""", returnStdout: true).trim()
 
 		snapBuildTime = sh (script: """
 			echo ${buildOutput} | cut -d '-' -f2 | cut -d '_' -f1
