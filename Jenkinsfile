@@ -80,7 +80,6 @@ try {
 					if test -f /var/lib/apps/subutai/current/p2p.save; then rm /var/lib/apps/subutai/current/p2p.save; fi
 					systemctl restart subutai_p2p_*.service
 					if test -f /mnt/lib/lxc/tmpdir/management-subutai-template_*; then rm /mnt/lib/lxc/tmpdir/management-subutai-template_*; fi
-					rm /mnt/lib/lxc/tmpdir/management-subutai-template_*
 				EOF"""
 
 				/* copy built snap on test node */
