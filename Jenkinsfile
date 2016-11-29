@@ -38,9 +38,9 @@ try {
 		"""
 
 		/* build snap */
-		String buildOutput = sh (script: """
+		sh """
 			./autobuild.sh -b
-			""", returnStdout: true).trim()
+		"""
 
 		snapBuildTime = sh (script: """
 			echo ${buildOutput} | cut -d '-' -f2 | cut -d '_' -f1
@@ -49,7 +49,7 @@ try {
 
 		/* rename built snap */
 		sh """
-			mv (echo $out | cut -d \' -f 2) subutai_${agentVersion}_amd64-${env.BRANCH_NAME}.snap
+			mv snap/subutai_* subutai_${agentVersion}_amd64-${env.BRANCH_NAME}.snap
 		"""
 
 		/* stash snap to use it in next node() */
