@@ -91,6 +91,7 @@ try {
 				// install generated management template
 				sh """
 					set +x
+					ssh root@${env.SS_TEST_NODE} <<- EOF
 					if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
 					snappy install /tmp/subutai_subos_builder.snap --allow-unauthenticated
 					ssh root@${env.SS_TEST_NODE} <<- EOF
