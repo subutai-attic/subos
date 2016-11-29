@@ -175,6 +175,11 @@ try {
 	notifyBuild(currentBuild.result, notifyBuildDetails)
 }
 
+@NonCPS
+def jsonParse(def json) {
+    new groovy.json.JsonSlurperClassic().parseText(json)
+}
+
 // https://jenkins.io/blog/2016/07/18/pipline-notifications/
 def notifyBuild(String buildStatus = 'STARTED', String details = '') {
 	// build status of null means successful
