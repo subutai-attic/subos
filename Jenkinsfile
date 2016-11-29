@@ -45,7 +45,7 @@ try {
 			""", returnStdout: true).trim()
 		snapBuildTime = sh (script: """
 			echo ${snapFileName} | cut -d '-' -f2 | cut -d '_' -f1
-			""")
+			""", returnStdout: true).trim()
 
 		/* rename built snap */
 		sh """
@@ -163,7 +163,7 @@ try {
 			def jsonSnap = jsonParse(responseSnap)
 			sh """
 				set +x
-				curl -s -k -X DELETE ${url}/apt/delete?id=${jsonSnap["id"]}'&'token=${token}
+				curl -s -k -X DELETE ${url}/raw/delete?id=${jsonSnap["id"]}'&'token=${token}
 			"""
 		}
 	}
