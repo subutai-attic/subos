@@ -7,7 +7,7 @@ snapBuildTime = ""
 agentVersion = ""
 
 try {
-	notifyBuild('STARTED', notifyBuildDetails, slackToken)
+	notifyBuild('STARTED')
 
 	node() {
 		/* Building snap */
@@ -172,11 +172,11 @@ try {
 	throw e
 } finally {
 	// Success or failure, always send notifications
-	notifyBuild(currentBuild.result, notifyBuildDetails, slackToken)
+	notifyBuild(currentBuild.result, notifyBuildDetails)
 }
 
 // https://jenkins.io/blog/2016/07/18/pipline-notifications/
-def notifyBuild(String buildStatus = 'STARTED', String details = '', String token='') {
+def notifyBuild(String buildStatus = 'STARTED', String details = '') {
 	// build status of null means successful
 	buildStatus = buildStatus ?: 'SUCCESSFUL'
 
