@@ -42,10 +42,12 @@ try {
 			./autobuild.sh -b
 		"""
 
-		snapBuildTime = sh (script: """
-			echo ${buildOutput} | cut -d '-' -f2 | cut -d '_' -f1
+		snapFileName = sh (script: """
+			ls snap/
 			""", returnStdout: true)
-
+		snapBuildTime = sh (script: """
+			echo ${snapFileName} | cut -d '-' -f2 | cut -d '_' -f1
+			""")
 
 		/* rename built snap */
 		sh """
@@ -59,8 +61,8 @@ try {
 	node() {
 		/* Running Integration tests only on dev branch */
 		deleteDir()
-		lock('test-node') {
-			if (env.BRANCH_NAME == 'jenkinsfile') {
+		if (env.BRANCH_NAME == 'jenkinsfile') {
+			lock('test-node') {
 				mvnHome = tool 'M3'
 
 				stage("Update test node")
@@ -152,7 +154,7 @@ try {
 			""", returnStdout: true)
 		sh """
 			set +x
-			curl -s -k -Ffile=@${filename} -Ftoken=${token} ${url}/raw/upload
+			curl -s -k -Ffile=@${filename} -Fversion=${snapBuildTime} -Ftoken=${token} ${url}/raw/upload
 		"""
 
 		/* delete old snap */
