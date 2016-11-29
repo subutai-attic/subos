@@ -92,10 +92,9 @@ try {
 				sh """
 					set +x
 					ssh root@${env.SS_TEST_NODE} <<- EOF
+					set -e
 					if test -f /var/lib/apps/subutai/current/agent.gcfg; then rm /var/lib/apps/subutai/current/agent.gcfg; fi
 					snappy install /tmp/subutai_subos_builder.snap --allow-unauthenticated
-					ssh root@${env.SS_TEST_NODE} <<- EOF
-					set -e
 					echo y | subutai import management
 				EOF"""
 
