@@ -158,8 +158,8 @@ try {
 		// 	curl -s -k -Ffile=@${filename} -Fversion=${snapBuildTime} -Ftoken=${token} ${url}/raw/upload
 		// """
 
-		// upload raw
-		String responseTemplate = sh (script: """
+		// upload snap
+		String responseSnap = sh (script: """
 			set +x
 			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/raw/info?name=${filename}
 			""", returnStdout: true)
