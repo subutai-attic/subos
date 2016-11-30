@@ -148,14 +148,28 @@ try {
 			curl -s -k -Fmessage=\"${authID}\" -Fuser=${user} ${url}/auth/token
 			""", returnStdout: true)
 
-		/* Upload snap to kurjun */
-		String responseSnap = sh (script: """
+		// /* Upload snap to kurjun */
+		// String responseSnap = sh (script: """
+		// 	set +x
+		// 	curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/raw/info?name=${filename}
+		// 	""", returnStdout: true)
+		// sh """
+		// 	set +x
+		// 	curl -s -k -Ffile=@${filename} -Fversion=${snapBuildTime} -Ftoken=${token} ${url}/raw/upload
+		// """
+
+		// upload raw
+		String responseTemplate = sh (script: """
 			set +x
 			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/raw/info?name=${filename}
 			""", returnStdout: true)
+		def signatureSnap = sh (script: """
+			set +x
+			curl -s -k -Ffile=@${filename} -Fversion=${snapBuildTime} -Ftoken=${token} ${url}/raw/upload | gpg --clearsign --no-tty
+			""", returnStdout: true)
 		sh """
 			set +x
-			curl -s -k -Ffile=@${filename} -Fversion=${snapBuildTime} -Ftoken=${token} ${url}/raw/upload
+			curl -s -k -Ftoken=${token} -Fsignature=\"${signatureSnap}\" ${url}/auth/sign
 		"""
 
 		/* delete old snap */
