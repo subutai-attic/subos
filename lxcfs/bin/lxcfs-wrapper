@@ -1,6 +1,9 @@
 #!/bin/sh
 # make dir for lxcfs
 mkdir -p /var/run/lxcfs/mounts
+mkdir -p /var/run/lxcfs/controllers
+
+sleep 2 && chmod -R 755 /var/run/lxcfs &
 
 exec ${SNAP_APP_PATH}/bin/lxcfs /var/run/lxcfs/mounts
 

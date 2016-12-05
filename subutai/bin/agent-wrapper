@@ -9,6 +9,5 @@ done
 while [ ! -d /var/run/lxcfs/controllers ]; do
 	sleep 1
 done
-chmod -R 755 /var/run/lxcfs
 
 exec /apps/subutai/current/bin/subutai daemon
