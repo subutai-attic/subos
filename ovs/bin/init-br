@@ -35,7 +35,7 @@ iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-f
 ifup -a --allow=env
 
 while true; do
-	timeout 10 dhclient eth0
+	timeout 20 dhclient eth0
 	if [ "$?" == "0" ]; then
 		ovs-vsctl --may-exist add-port wan eth0
 		ovs-vsctl --if-exists del-port wan eth1
@@ -51,7 +51,7 @@ while true; do
 	if [ "$(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')" != "wan" ]; then
 		ip route del 0/0
 	fi
-	timeout 10 dhclient wan
+	timeout 20 dhclient wan
 	timeout 10 dhclient eth2
 	timeout 10 dhclient eth1
 
@@ -69,6 +69,6 @@ while true; do
 		timeout 10 dhclient mng-net
 	fi
 
-	sleep 10
+	sleep 20
 	ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
 done
