@@ -9,7 +9,7 @@ lxcPrefix = /mnt/lib/lxc/
 [management]
 gpgUser =
 port = 8443
-host = 10.10.10.1
+host =
 secret = secret
 restPublicKey = /rest/v1/security/keyman/getpublickeyring
 
@@ -19,7 +19,7 @@ sslport = 8338
 allowinsecure = false
 
 [influxdb]
-server = 10.10.10.1
+server =
 user = root
 pass = root
 db = metrics

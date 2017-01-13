@@ -21,13 +21,9 @@ allow-hotplug eth0
 iface eth0 inet manual
 EOF
 
-ovs-vsctl --may-exist add-port wan mng-net -- set interface mng-net type=internal
-ovs-vsctl set interface mng-net mac=$(ovs-vsctl get interface mng-net mac_in_use | tr -d '"' | sed 's/:/\\:/g')
-ovs-vsctl set port mng-net tag=$MNG_VLAN
-
 ovs-vsctl --may-exist add-br lxc-br
 ovs-vsctl --may-exist add-port lxc-br nat -- set interface nat type=internal
-ifconfig nat 10.10.0.254/24
+ifconfig nat 10.10.10.254/24
 
 iptables -t nat -A POSTROUTING -j MASQUERADE
 iptables -A POSTROUTING -t mangle -p udp --dport bootpc -j CHECKSUM --checksum-fill
@@ -65,10 +61,6 @@ while true; do
 		AUTOBUILD_IP=""
 	fi
 
-	if [ "$(ifconfig mng-net | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')" != "10.10.10.254" ]; then
-		timeout 10 dhclient mng-net
-	fi
-
 	sleep 20
-	ps aux | egrep "dhclient eth|dhclient wan|dhclient mng-net" | awk '{print $2}' | xargs kill
+	ps aux | egrep "dhclient eth|dhclient wan" | awk '{print $2}' | xargs kill
 done

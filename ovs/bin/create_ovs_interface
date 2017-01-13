@@ -14,15 +14,11 @@ vlan="$(grep '#vlan_id' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 gateway="$(grep 'lxc.network.ipv4.gateway' /mnt/lib/lxc/$1/config | awk '{print $3}')"
 
 if [ "$5" == "management" ]; then
-	ovs-vsctl --if-exists del-port wan $5
-	ovs-vsctl --may-exist add-port wan $5
-	ovs-vsctl set port $5 tag=$MNG_VLAN
-	ps aux | grep "dhclient mng-net" | awk '{print $2}' | xargs kill
-        dhclient -r mng-net
-        ifconfig mng-net 10.10.10.254/24
+	ovs-vsctl --if-exists del-port lxc-br $5
+	ovs-vsctl --may-exist add-port lxc-br $5
 
-        for i in 8443 8444; do
-		for j in wan eth1 eth2; do iptables -t nat -A PREROUTING -i $j -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i ; done
+        for i in 8443 8444 8086; do
+		iptables -t nat -A PREROUTING -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i
         done
 
         exit 0
@@ -61,5 +57,5 @@ EOF
 else
         ovs-vsctl --if-exists del-port lxc-br $5
         ovs-vsctl --may-exist add-port lxc-br $5
-	echo -e "\n10.10.0.254  gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
+	echo -e "\n10.10.10.254  gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
 fi
