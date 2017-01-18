@@ -59,3 +59,9 @@ else
         ovs-vsctl --may-exist add-port lxc-br $5
 	echo -e "\n10.10.10.254  gw.intra.lan" >> /mnt/lib/lxc/$1/rootfs/etc/hosts
 fi
+
+rate="$(grep 'subutai.network.ratelimit' /mnt/lib/lxc/$1/config | awk '{print $3}')"
+if [ "$rate" != "" ]; then
+	ovs-vsctl set interface $5 "ingress_policing_rate="+$rate
+	ovs-vsctl set interface $5 "ingress_policing_burst="+$((rate/10))
+fi
