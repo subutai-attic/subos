@@ -36,13 +36,13 @@ function snap_build {
 		pushd /tmp
 		tar czf /tmp/snap.tgz tmpdir_subutai
 		popd
-		sshpass -p "ubuntu" scp -P5567 /tmp/snap.tgz ubuntu@localhost:/home/ubuntu/tmpfs/
-		sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "cd /home/ubuntu/tmpfs && tar zxf snap.tgz && cd tmpdir_subutai && snappy build && mv *.snap .."
+		sshpass -p "ubuntu" scp -o IdentitiesOnly=yes -P5567 /tmp/snap.tgz ubuntu@localhost:/home/ubuntu/tmpfs/
+		sshpass -p "ubuntu" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "cd /home/ubuntu/tmpfs && tar zxf snap.tgz && cd tmpdir_subutai && snappy build && mv *.snap .."
 		if [ "$BUILD" == "true" ]; then
 			mkdir -p $EXPORT_DIR/snap
-			sshpass -p "ubuntu" scp -P5567 ubuntu@localhost:/home/ubuntu/tmpfs/subutai*.snap $EXPORT_DIR/snap
+			sshpass -p "ubuntu" scp -o IdentitiesOnly=yes -P5567 ubuntu@localhost:/home/ubuntu/tmpfs/subutai*.snap $EXPORT_DIR/snap
 		else
-			sshpass -p "ubuntu" scp -P5567 ubuntu@localhost:/home/ubuntu/tmpfs/subutai*.snap /tmp
+			sshpass -p "ubuntu" scp -o IdentitiesOnly=yes -P5567 ubuntu@localhost:/home/ubuntu/tmpfs/subutai*.snap /tmp
 		fi
 	elif [ "$BUILD" == "true" ]; then
 		snappy build "/tmp/tmpdir_subutai" --output=$EXPORT_DIR/snap
@@ -69,7 +69,7 @@ function clone_vm {
 	ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:5567
 
 	echo "Waiting for ssh"
-	while [ "$(sshpass -p "ubuntu" ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "ls" > /dev/null 2>&1; echo $?)" != "0" ]; do
+	while [ "$(sshpass -p "ubuntu" ssh -o ConnectTimeout=1 -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "ls" > /dev/null 2>&1; echo $?)" != "0" ]; do
 		sleep 2
 	done
 }
@@ -78,19 +78,19 @@ function install_snap {
 	if [ -f "$HOME/.ssh/id_rsa.pub" ]; then
 		echo "Adding user public key"
 		pubkey="$(head -1 $HOME/.ssh/id_rsa.pub)"
-		sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sudo bash -c 'echo $pubkey >> /root/.ssh/authorized_keys'"
+		sshpass -p "ubuntu" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sudo bash -c 'echo $pubkey >> /root/.ssh/authorized_keys'"
 	fi
 	echo "Creating tmpfs"
-	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "mkdir tmpfs; sudo mount -t tmpfs -o size=1G tmpfs /home/ubuntu/tmpfs"
+	sshpass -p "ubuntu" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "mkdir tmpfs; sudo mount -t tmpfs -o size=1G tmpfs /home/ubuntu/tmpfs"
 	echo "Copying snap"
 	if [ "$(which snappy)" == "" ]; then
 		snap_build
 	fi
-	sshpass -p "ubuntu" scp -P5567 prepare-server.sh /tmp/subutai_4.*-${DATE}_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
+	sshpass -p "ubuntu" scp -o IdentitiesOnly=yes -P5567 prepare-server.sh /tmp/subutai_4.*-${DATE}_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
 	AUTOBUILD_IP=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep -Po 'inet \K[\d.]+')
-	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sed -i \"s/IPPLACEHOLDER/$AUTOBUILD_IP/g\" /home/ubuntu/tmpfs/prepare-server.sh"
+	sshpass -p "ubuntu" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sed -i \"s/IPPLACEHOLDER/$AUTOBUILD_IP/g\" /home/ubuntu/tmpfs/prepare-server.sh"
 	echo "Running install script"
-	sshpass -p "ubuntu" ssh -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sudo /home/ubuntu/tmpfs/prepare-server.sh"
+	sshpass -p "ubuntu" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sudo /home/ubuntu/tmpfs/prepare-server.sh"
 }
 
 function prepare_nic {
