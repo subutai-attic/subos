@@ -2,6 +2,10 @@
 #Include enviroment variables
 . $(cd `dirname "${BASH_SOURCE[0]}"` && pwd)/subutai.env
 
+if [ ! -f $SUBUTAI_DATA_PREFIX/agent.gcfg ]; then
+	cp $SUBUTAI_APP_PREFIX/etc/agent.gcfg $SUBUTAI_DATA_PREFIX/agent.gcfg
+fi
+
 while [ ! -S /sys/fs/cgroup/cgmanager/sock ]; do
 	sleep 1
 done
