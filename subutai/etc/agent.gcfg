@@ -14,7 +14,7 @@ secret = secret
 restPublicKey = /rest/v1/security/keyman/getpublickeyring
 
 [cdn]
-url = cdn.subut.ai
+url = devcdn.subut.ai
 sslport = 8338
 allowinsecure = false
 
