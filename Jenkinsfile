@@ -144,7 +144,6 @@ try {
 			default: url = "https://devcdn.subut.ai:8338/kurjun/rest"
 		}
 
-		// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 		String user = "jenkins"
 		def authID = sh (script: """
 			set +x
@@ -158,17 +157,7 @@ try {
 		/* Upload snap to kurjun */
 		String responseSnap = sh (script: """
 			set +x
-			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/raw/info?name=${filename}
-			""", returnStdout: true)
-		// sh """
-		// 	set +x
-		// 	curl -s -k -Ffile=@${filename} -Fversion=${snapBuildTime} -Ftoken=${token} ${url}/raw/upload
-		// """
-
-		// upload raw
-		String responseTemplate = sh (script: """
-			set +x
-			curl -s -k https://eu0.cdn.subut.ai:8338/kurjun/rest/raw/info?name=${filename}
+			curl -s -k ${url}/raw/info?name=${filename}
 			""", returnStdout: true)
 		def signatureSnap = sh (script: """
 			set +x
