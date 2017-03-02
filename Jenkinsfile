@@ -5,6 +5,7 @@ subosCommitId = ""
 serenityReportDir = ""
 snapBuildTime = ""
 agentVersion = ""
+url = ""
 
 try {
 	notifyBuild('STARTED')
@@ -137,7 +138,13 @@ try {
 		String filename = "subutai_${agentVersion}_amd64-${env.BRANCH_NAME}.snap"
 
 		/* cdn auth creadentials */
-		String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
+		// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
+		switch (env.BRANCH_NAME) {
+			case ~/master/: url = "https://stagecdn.subut.ai:8338/kurjun/rest"; break;
+			default: url = "https://devcdn.subut.ai:8338/kurjun/rest"
+		}
+
+		// String url = "https://eu0.cdn.subut.ai:8338/kurjun/rest"
 		String user = "jenkins"
 		def authID = sh (script: """
 			set +x
