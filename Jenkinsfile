@@ -173,7 +173,7 @@ try {
 			def jsonSnap = jsonParse(responseSnap)
 			sh """
 				set +x
-				curl -s -k -X DELETE ${url}/raw/delete?id=${jsonSnap["id"]}'&'token=${token}
+				curl -s -k -X DELETE ${url}/raw/delete?id=${jsonSnap[0]["id"]}'&'token=${token}
 			"""
 		}
 	}
