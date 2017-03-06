@@ -87,7 +87,7 @@ function install_snap {
 		snap_build
 	fi
 	sshpass -p "ubuntu" scp -o IdentitiesOnly=yes -P5567 prepare-server.sh /tmp/subutai_4.*-${DATE}_amd64.snap ubuntu@localhost:/home/ubuntu/tmpfs/
-	AUTOBUILD_IP=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}'` | grep -Po 'inet \K[\d.]+')
+	AUTOBUILD_IP=$(/bin/ip addr show `/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}' | head -n1` | grep -Po 'inet \K[\d.]+')
 	sshpass -p "ubuntu" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sed -i \"s/IPPLACEHOLDER/$AUTOBUILD_IP/g\" /home/ubuntu/tmpfs/prepare-server.sh"
 	echo "Running install script"
 	sshpass -p "ubuntu" ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=no ubuntu@localhost -p5567 "sudo /home/ubuntu/tmpfs/prepare-server.sh"
@@ -114,7 +114,7 @@ function prepare_nic {
 	vboxmanage modifyvm $CLONE --nic2 nat
 	vboxmanage modifyvm $CLONE --natpf2 "ssh-fwd,tcp,,4567,,22"
 	vboxmanage modifyvm $CLONE --nic1 bridged
-	vboxmanage modifyvm $CLONE --bridgeadapter1 $(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}')
+	vboxmanage modifyvm $CLONE --bridgeadapter1 $(/sbin/route -n | grep ^0.0.0.0 | awk '{print $8}' | head -n1)
 }
 
 function export_ova {
