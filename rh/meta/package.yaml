@@ -31,7 +31,7 @@ services:
  - name: p2p
    security-template: unconfined
    description: "p2p service"
-   start: bin/p2p daemon -save /var/lib/apps/subutai/current/p2p.save 
+   start: bin/p2p daemon -save /var/lib/apps/subutai/current/p2p.save -syslog 127.0.0.1:1514
  - name: subutai-agent
    security-template: unconfined
    description: "Subutai-agent service"
