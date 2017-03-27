@@ -17,10 +17,6 @@ if [ "$5" == "management" ]; then
 	ovs-vsctl --if-exists del-port lxc-br $5
 	ovs-vsctl --may-exist add-port lxc-br $5
 
-        for i in 8443 8444 8086; do
-		for j in wan eth1 eth2; do iptables -t nat -A PREROUTING -i $j -p tcp -m tcp --dport $i -j DNAT --to-destination 10.10.10.1:$i ; done
-        done
-
         exit 0
 elif [ "$vlan" ]; then
         ovs-vsctl add-br gw-$vlan
